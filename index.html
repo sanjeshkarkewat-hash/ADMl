@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Vedanta Admin Panel | Fixed Date Filter</title>
+    <title>Vedanta Admin Panel | Firebase Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -526,6 +529,14 @@
         }
         .error-msg { color: #F44336; font-size: 12px; text-align: center; margin-top: 15px; display: none; }
         .error-msg.show { display: block; }
+        .sync-badge {
+            background: rgba(76,175,80,0.2);
+            color: #4CAF50;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            margin-left: 10px;
+        }
         @media (max-width: 700px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             th, td { font-size: 10px; padding: 8px; }
@@ -541,12 +552,96 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // ========== 🔥 FIREBASE CONFIGURATION ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMPUAV50FOsqpyTKY3lioeAgbQvxQzLnM",
+            authDomain: "vedanta-d0199.firebaseapp.com",
+            projectId: "vedanta-d0199",
+            storageBucket: "vedanta-d0199.firebasestorage.app",
+            messagingSenderId: "761061711987",
+            appId: "1:761061711987:web:d59ff32fd53057c395ca06",
+            measurementId: "G-RQMQZVGK75"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        console.log("🔥 Firebase Connected!");
+        
+        // ========== FIREBASE FUNCTIONS ==========
+        async function getAllProductsFromFirebase() {
+            try {
+                const snapshot = await db.collection('products')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                const products = [];
+                snapshot.forEach(doc => {
+                    products.push({ id: doc.id, ...doc.data() });
+                });
+                return products;
+            } catch (error) {
+                console.error("Error loading products:", error);
+                return [];
+            }
+        }
+        
+        async function getAllOrdersFromFirebase() {
+            try {
+                const snapshot = await db.collection('orders')
+                    .orderBy('orderDate', 'desc')
+                    .get();
+                const orders = [];
+                snapshot.forEach(doc => {
+                    orders.push({ id: doc.id, ...doc.data() });
+                });
+                return orders;
+            } catch (error) {
+                console.error("Error loading orders:", error);
+                return [];
+            }
+        }
+        
+        async function updateOrderStatusInFirebase(orderId, newStatus) {
+            try {
+                await db.collection('orders').doc(orderId).update({
+                    status: newStatus,
+                    updatedAt: new Date().toISOString()
+                });
+                return { success: true };
+            } catch (error) {
+                console.error("Error updating order:", error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function deleteProductFromFirebase(productId) {
+            try {
+                await db.collection('products').doc(productId).delete();
+                return { success: true };
+            } catch (error) {
+                console.error("Error deleting product:", error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function deleteOrderFromFirebase(orderId) {
+            try {
+                await db.collection('orders').doc(orderId).delete();
+                return { success: true };
+            } catch (error) {
+                console.error("Error deleting order:", error);
+                return { success: false, error: error.message };
+            }
+        }
+        
         const ADMIN_USERNAME = "vedanta";
         const ADMIN_PASSWORD = "king@63061";
 
-        function showToast(msg) {
+        function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
+            toast.style.background = isError ? '#F44336' : '#D4AF37';
+            toast.style.color = isError ? 'white' : '#050508';
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
@@ -562,50 +657,52 @@
         let customStartDate = '';
         let customEndDate = '';
 
-        function loadData() {
+        // ========== LOAD DATA FROM FIREBASE ==========
+        async function loadData() {
             try {
-                const savedProducts = localStorage.getItem('vedantaProducts');
-                if (savedProducts && savedProducts !== 'undefined' && savedProducts !== 'null') {
-                    const parsed = JSON.parse(savedProducts);
-                    if (Array.isArray(parsed)) {
-                        products = parsed;
+                // Load products from Firebase
+                const firebaseProducts = await getAllProductsFromFirebase();
+                if (firebaseProducts.length > 0) {
+                    products = firebaseProducts;
+                    // Save to localStorage as backup
+                    localStorage.setItem('vedantaProducts', JSON.stringify(products));
+                } else {
+                    // Fallback to localStorage
+                    const savedProducts = localStorage.getItem('vedantaProducts');
+                    if (savedProducts && savedProducts !== 'undefined' && savedProducts !== 'null') {
+                        const parsed = JSON.parse(savedProducts);
+                        if (Array.isArray(parsed)) products = parsed;
                     }
                 }
-                const savedOrders = localStorage.getItem('vedantaOrders');
-                if (savedOrders && savedOrders !== 'undefined' && savedOrders !== 'null') {
-                    const parsed = JSON.parse(savedOrders);
-                    if (Array.isArray(parsed)) {
-                        orders = parsed;
+                
+                // Load orders from Firebase
+                const firebaseOrders = await getAllOrdersFromFirebase();
+                if (firebaseOrders.length > 0) {
+                    orders = firebaseOrders;
+                    // Save to localStorage as backup
+                    localStorage.setItem('vedantaOrders', JSON.stringify(orders));
+                } else {
+                    // Fallback to localStorage
+                    const savedOrders = localStorage.getItem('vedantaOrders');
+                    if (savedOrders && savedOrders !== 'undefined' && savedOrders !== 'null') {
+                        const parsed = JSON.parse(savedOrders);
+                        if (Array.isArray(parsed)) orders = parsed;
                     }
                 }
-            } catch(e) { console.log("Error loading data"); }
-            
-            if (!products || products.length === 0) {
-                // Demo products for better visualization
-                products = [];
-                localStorage.setItem('vedantaProducts', JSON.stringify(products));
-            }
-            // Add sample orders if none for testing date filter
-            if (!orders || orders.length === 0) {
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(today.getDate() - 1);
-                const twoDaysAgo = new Date(today);
-                twoDaysAgo.setDate(today.getDate() - 2);
                 
-                const formatDate = (date) => {
-                    const day = date.getDate();
-                    const month = date.getMonth() + 1;
-                    const year = date.getFullYear();
-                    return `${day}/${month}/${year}, ${date.toLocaleTimeString()}`;
-                };
+                if (!products || products.length === 0) {
+                    products = [];
+                }
                 
-                orders = [
-                    { orderId: "ORD1001", date: formatDate(today), status: "delivered", total: 1299, customer: { fullName: "Rahul Sharma", phone: "9876543210", address: "Delhi" }, items: [{ id: 1, name: "Kurta Set", price: 1299, quantity: 1, size: "M" }], subtotal: 1299, paymentMethod: "COD" },
-                    { orderId: "ORD1002", date: formatDate(yesterday), status: "confirmed", total: 2499, customer: { fullName: "Priya Singh", phone: "9988776655", address: "Mumbai" }, items: [{ id: 2, name: "Saree", price: 2499, quantity: 1, size: "L" }], subtotal: 2499, paymentMethod: "Online" },
-                    { orderId: "ORD1003", date: formatDate(twoDaysAgo), status: "shipped", total: 899, customer: { fullName: "Amit Verma", phone: "9876541230", address: "Bangalore" }, items: [{ id: 3, name: "Men's Jacket", price: 899, quantity: 1, size: "XL" }], subtotal: 899, paymentMethod: "COD" }
-                ];
-                saveOrders();
+                if (!orders || orders.length === 0) {
+                    orders = [];
+                }
+                
+                updateStats();
+                renderProducts();
+                renderOrders();
+            } catch(e) { 
+                console.log("Error loading data:", e); 
             }
         }
 
@@ -617,12 +714,10 @@
             localStorage.setItem('vedantaOrders', JSON.stringify(orders));
         }
 
-        // FIXED: Robust date parsing and comparison for exact date match (dd/mm/yyyy)
+        // Date parsing functions
         function parseDisplayDateToComparable(dateStr) {
             if (!dateStr) return null;
-            // Order date format stored as "DD/MM/YYYY, HH:MM:SS" or "DD/MM/YYYY"
             let datePart = dateStr.split(',')[0].trim();
-            // Support DD/MM/YYYY or DD-MM-YYYY
             let parts = datePart.includes('/') ? datePart.split('/') : datePart.split('-');
             if (parts.length === 3) {
                 const day = parseInt(parts[0], 10);
@@ -668,13 +763,11 @@
             return orderDate.getMonth() === today.getMonth() && orderDate.getFullYear() === today.getFullYear();
         }
 
-        // FIXED: Custom range filtering - exact date match for start and inclusive end
         function isWithinCustomRange(orderDateStr) {
             if (!customStartDate) return true;
             const orderDate = parseDisplayDateToComparable(orderDateStr);
             if (!orderDate) return false;
             
-            // customStartDate format: "DD/MM/YYYY"
             const startParts = customStartDate.split('/');
             const startDateObj = new Date(parseInt(startParts[2], 10), parseInt(startParts[1], 10) - 1, parseInt(startParts[0], 10));
             
@@ -684,7 +777,6 @@
                 endDateObj.setHours(23,59,59,999);
                 return orderDate >= startDateObj && orderDate <= endDateObj;
             } else {
-                // If only start date selected: show orders exactly on that day
                 return isSameDate(orderDate, startDateObj);
             }
         }
@@ -697,18 +789,18 @@
             }
             
             if (currentDateFilter === 'today') {
-                filtered = filtered.filter(o => isToday(o.date));
+                filtered = filtered.filter(o => isToday(o.orderDate || o.date));
             } else if (currentDateFilter === 'week') {
-                filtered = filtered.filter(o => isThisWeek(o.date));
+                filtered = filtered.filter(o => isThisWeek(o.orderDate || o.date));
             } else if (currentDateFilter === 'month') {
-                filtered = filtered.filter(o => isThisMonth(o.date));
+                filtered = filtered.filter(o => isThisMonth(o.orderDate || o.date));
             } else if (currentDateFilter === 'custom' && customStartDate) {
-                filtered = filtered.filter(o => isWithinCustomRange(o.date));
+                filtered = filtered.filter(o => isWithinCustomRange(o.orderDate || o.date));
             }
             
             filtered.sort((a, b) => {
-                const dateA = parseDisplayDateToComparable(a.date);
-                const dateB = parseDisplayDateToComparable(b.date);
+                const dateA = parseDisplayDateToComparable(a.orderDate || a.date);
+                const dateB = parseDisplayDateToComparable(b.orderDate || b.date);
                 if (!dateA || !dateB) return 0;
                 return dateB - dateA;
             });
@@ -748,7 +840,7 @@
                 totalRevenueEl.innerText = '₹' + totalRevenue.toLocaleString('en-IN');
             }
             if (totalCustomersEl) {
-                const uniqueCustomers = new Set(orders.filter(o => o.status !== 'cancelled').map(o => o.customer?.phone)).size;
+                const uniqueCustomers = new Set(orders.filter(o => o.status !== 'cancelled').map(o => o.customerEmail || o.customer?.email)).size;
                 totalCustomersEl.innerText = uniqueCustomers;
             }
         }
@@ -773,21 +865,26 @@
                     <div class="product-category">${p.category || 'General'} • ${p.badge || 'New'}</div>
                     ${p.videoUrl ? `<div style="font-size: 10px; color: #888;"><i class="fas fa-video"></i> Video included</div>` : ''}
                     <div class="product-actions">
-                        <button class="edit-btn" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="delete-btn" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i> Delete</button>
+                        <button class="edit-btn" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i> Delete</button>
                     </div>
                 </div>
             `).join('');
             updateStats();
         }
 
-        function deleteOrder(orderId) {
-            if (confirm('⚠️ Are you sure you want to DELETE this order permanently? This action cannot be undone!')) {
-                orders = orders.filter(o => o.orderId !== orderId);
-                saveOrders();
-                showToast(`🗑️ Order ${orderId} deleted permanently!`);
-                renderOrders();
-                updateStats();
+        async function deleteOrder(orderId) {
+            if (confirm('⚠️ Are you sure you want to DELETE this order permanently from cloud? This action cannot be undone!')) {
+                const result = await deleteOrderFromFirebase(orderId);
+                if (result.success) {
+                    orders = orders.filter(o => (o.orderId || o.id) !== orderId);
+                    saveOrders();
+                    showToast(`🗑️ Order ${orderId} deleted permanently from cloud!`);
+                    renderOrders();
+                    updateStats();
+                } else {
+                    showToast('❌ Failed to delete order from cloud', true);
+                }
             }
         }
 
@@ -805,16 +902,17 @@
             container.innerHTML = filteredOrders.map(order => {
                 const statusBadgeClass = getStatusBadgeClass(order.status);
                 const statusDisplay = order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Confirmed';
+                const orderIdDisplay = order.orderId || order.id;
                 
                 return `
                     <tr>
-                        <td>${order.orderId || 'N/A'}</td>
-                        <td>${order.date || 'N/A'}</td>
-                        <td>${order.customer?.fullName || order.customer?.name || 'Guest'}</td>
+                        <td>${orderIdDisplay}</td>
+                        <td>${new Date(order.orderDate || order.date).toLocaleDateString('en-IN')}</td>
+                        <td>${order.customerName || order.customer?.fullName || 'Guest'}</td>
                         <td>₹${(order.total || 0).toLocaleString('en-IN')}</td>
                         <td><span class="status-badge ${statusBadgeClass}">${statusDisplay}</span></td>
                         <td>
-                            <select class="status-select" data-order-id="${order.orderId}" onchange="updateOrderStatus('${order.orderId}', this.value)">
+                            <select class="status-select" data-order-id="${orderIdDisplay}" onchange="updateOrderStatus('${orderIdDisplay}', this.value)">
                                 <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
                                 <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
                                 <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
@@ -823,8 +921,8 @@
                             </select>
                         </td>
                         <td>
-                            <button class="view-details" onclick="viewOrderDetails('${order.orderId}')"><i class="fas fa-eye"></i> View</button>
-                            <button class="delete-order-btn" onclick="deleteOrder('${order.orderId}')"><i class="fas fa-trash"></i> Delete</button>
+                            <button class="view-details" onclick="viewOrderDetails('${orderIdDisplay}')"><i class="fas fa-eye"></i> View</button>
+                            <button class="delete-order-btn" onclick="deleteOrder('${orderIdDisplay}')"><i class="fas fa-trash"></i> Delete</button>
                         </td>
                     </tr>
                 `;
@@ -833,23 +931,28 @@
             updateStats();
         }
 
-        function updateOrderStatus(orderId, newStatus) {
-            const orderIndex = orders.findIndex(o => o.orderId === orderId);
-            if (orderIndex !== -1) {
-                orders[orderIndex].status = newStatus;
-                saveOrders();
+        async function updateOrderStatus(orderId, newStatus) {
+            const result = await updateOrderStatusInFirebase(orderId, newStatus);
+            if (result.success) {
+                const orderIndex = orders.findIndex(o => (o.orderId || o.id) === orderId);
+                if (orderIndex !== -1) {
+                    orders[orderIndex].status = newStatus;
+                    saveOrders();
+                }
                 showToast(`✅ Order ${orderId} status updated to ${newStatus}`);
                 renderOrders();
                 updateStats();
+            } else {
+                showToast('❌ Failed to update order status', true);
             }
         }
 
         function viewOrderDetails(orderId) {
-            const order = orders.find(o => o.orderId === orderId);
+            const order = orders.find(o => (o.orderId || o.id) === orderId);
             if (!order) return;
             
             const itemsHtml = (order.items || []).map(item => {
-                const product = products.find(p => p.id === item.id);
+                const product = products.find(p => p.id == item.id);
                 const hasImage = product && product.images && product.images.length > 0;
                 const imageUrl = hasImage ? product.images[0] : null;
                 const itemIcon = product ? (product.icon || 'fa-gem') : (item.icon || 'fa-gem');
@@ -879,21 +982,20 @@
             const statusDisplay = order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Confirmed';
 
             document.getElementById('orderDetailContent').innerHTML = `
-                <div class="order-detail-row"><strong>📋 Order ID:</strong> ${order.orderId}</div>
-                <div class="order-detail-row"><strong>📅 Date:</strong> ${order.date}</div>
+                <div class="order-detail-row"><strong>📋 Order ID:</strong> ${order.orderId || order.id}</div>
+                <div class="order-detail-row"><strong>📅 Date:</strong> ${new Date(order.orderDate || order.date).toLocaleString()}</div>
                 <div class="order-detail-row"><strong>📊 Status:</strong> <span class="status-badge ${statusBadgeClass}">${statusDisplay}</span></div>
                 <div class="order-detail-row"><strong>💳 Payment:</strong> ${order.paymentMethod || 'Cash on Delivery'}</div>
                 <div style="margin: 15px 0; border-top: 1px solid rgba(255,255,255,0.1);"></div>
                 <strong>👤 Customer Details:</strong>
-                <div class="order-detail-row"><strong>Name:</strong> ${order.customer?.fullName || order.customer?.name || 'Guest'}</div>
-                <div class="order-detail-row"><strong>📞 Phone:</strong> ${order.customer?.phone || 'N/A'}</div>
-                <div class="order-detail-row"><strong>✉️ Email:</strong> ${order.customer?.email || 'N/A'}</div>
-                <div class="order-detail-row"><strong>📍 Address:</strong> ${order.customer?.address || 'N/A'}, ${order.customer?.city || ''}, ${order.customer?.state || ''} - ${order.customer?.pincode || ''}</div>
+                <div class="order-detail-row"><strong>Name:</strong> ${order.customerName || order.customer?.fullName || 'Guest'}</div>
+                <div class="order-detail-row"><strong>📞 Phone:</strong> ${order.customerPhone || order.customer?.phone || 'N/A'}</div>
+                <div class="order-detail-row"><strong>✉️ Email:</strong> ${order.customerEmail || order.customer?.email || 'N/A'}</div>
+                <div class="order-detail-row"><strong>📍 Address:</strong> ${order.shippingAddress?.address || order.customer?.address || 'N/A'}</div>
                 <div style="margin: 15px 0; border-top: 1px solid rgba(255,255,255,0.1);"></div>
                 <strong>🛍️ Order Items:</strong>
                 ${itemsHtml || '<div class="order-detail-row">No items</div>'}
                 <div style="margin-top: 15px; border-top: 1px solid rgba(212,175,55,0.3);"></div>
-                <div class="order-detail-row"><strong>Subtotal:</strong> ₹${(order.subtotal || 0).toLocaleString('en-IN')}</div>
                 <div class="order-detail-row"><strong>💰 Total Amount:</strong> <span style="color:#D4AF37; font-size:18px;">₹${(order.total || 0).toLocaleString('en-IN')}</span></div>
             `;
             document.getElementById('orderModal').classList.add('show');
@@ -904,7 +1006,7 @@
         }
 
         function editProduct(id) {
-            const product = products.find(p => p.id === id);
+            const product = products.find(p => p.id == id);
             if (!product) return;
             const newName = prompt('Edit product name:', product.name);
             if (newName && newName.trim()) product.name = newName.trim();
@@ -915,12 +1017,17 @@
             showToast('✅ Product updated!');
         }
 
-        function deleteProduct(id) {
-            if (confirm('Are you sure you want to delete this product permanently?')) {
-                products = products.filter(p => p.id !== id);
-                saveProducts();
-                renderProducts();
-                showToast('✅ Product deleted permanently!');
+        async function deleteProduct(id) {
+            if (confirm('⚠️ Are you sure you want to DELETE this product permanently from cloud? This action cannot be undone!')) {
+                const result = await deleteProductFromFirebase(id);
+                if (result.success) {
+                    products = products.filter(p => p.id != id);
+                    saveProducts();
+                    renderProducts();
+                    showToast('✅ Product deleted permanently from cloud!');
+                } else {
+                    showToast('❌ Failed to delete product from cloud', true);
+                }
             }
         }
 
@@ -935,10 +1042,10 @@
         }
 
         function goToAddProduct() {
-            window.location.href = 'add-product-.html';
+            window.location.href = 'admin-add-product.html';
         }
 
-        // Date picker modal functions (unchanged UI, but fixed logic)
+        // Date picker modal functions
         let tempStartDate = '';
         let tempEndDate = '';
 
@@ -1040,57 +1147,198 @@
             renderOrders();
         }
 
-        function renderDashboard() { /* similar to original but includes fixed functions */ 
-            loadData();
-            document.getElementById('app').innerHTML = `...`; // Keep full dashboard rendering
-            // For brevity, actual full HTML string similar to original but with corrected onclick references. We'll use the existing working structure.
-        }
-        
-        // Full renderDashboard and login logic integrated but ensuring all handlers point to fixed filters.
-        // Since I'm providing final fix, I'll inject full working dashboard.
-        (function init() {
-            window.closeModal = closeModal;
-            window.viewOrderDetails = viewOrderDetails;
-            window.updateOrderStatus = updateOrderStatus;
-            window.editProduct = editProduct;
-            window.deleteProduct = deleteProduct;
-            window.deleteOrder = deleteOrder;
-            window.goToAddProduct = goToAddProduct;
-            window.applyDateFilter = applyDateFilter;
-            window.applyStatusFilter = applyStatusFilter;
-            window.openDatePicker = openDatePicker;
-            window.closeDatePicker = closeDatePicker;
-            window.applyDateRange = applyDateRange;
-            window.clearDateRange = clearDateRange;
-            window.setStartDate = setStartDate;
-            window.setEndDate = setEndDate;
-            loadData();
-            if (isLoggedIn) renderDashboard();
-            else renderLoginPage();
-        })();
-        
-        // Use the original dashboard HTML from first version but with all fixes already applied in the global scope.
-        // To avoid code duplication, I attach full renderDashboard and renderLoginPage as before.
         function renderDashboard() {
-            loadData();
             document.getElementById('app').innerHTML = `
-                <div class="header"><div class="logo"><h1>VEDANTA ADMIN</h1></div><button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
-                <div class="stats-grid"><div class="stat-card"><i class="fas fa-box"></i><div class="stat-number" id="totalProducts">0</div><div class="stat-label">Total Products</div></div><div class="stat-card"><i class="fas fa-shopping-cart"></i><div class="stat-number" id="totalOrders">0</div><div class="stat-label">Total Orders</div></div><div class="stat-card"><i class="fas fa-rupee-sign"></i><div class="stat-number" id="totalRevenue">0</div><div class="stat-label">Total Revenue</div></div><div class="stat-card"><i class="fas fa-users"></i><div class="stat-number" id="totalCustomers">0</div><div class="stat-label">Customers</div></div></div>
-                <div class="tabs"><button class="tab-btn active" data-tab="products">📦 Products</button><button class="tab-btn" data-tab="orders">📋 Orders</button></div>
-                <div class="tab-content active" id="productsTab"><div class="add-product-header"><h3><i class="fas fa-boxes"></i> All Products</h3><button class="add-product-link" id="addProductBtn"><i class="fas fa-plus-circle"></i> Add New Product</button></div><div class="products-list" id="productsList"></div></div>
-                <div class="tab-content" id="ordersTab"><div class="order-filters"><div class="filter-group"><span style="color:#888;">📅 Quick Date:</span><button class="filter-btn date-filter-btn active" data-filter="all" onclick="applyDateFilter('all')">All Orders</button><button class="filter-btn date-filter-btn" data-filter="today" onclick="applyDateFilter('today')">Today</button><button class="filter-btn date-filter-btn" data-filter="week" onclick="applyDateFilter('week')">This Week</button><button class="filter-btn date-filter-btn" data-filter="month" onclick="applyDateFilter('month')">This Month</button></div><div class="filter-group"><span style="color:#888;">📅 Custom Range:</span><div class="date-range-box" onclick="openDatePicker()"><i class="fas fa-calendar-alt"></i><span class="date-range-text" id="dateRangeText">Select Date Range</span><i class="fas fa-chevron-down"></i></div><button class="filter-btn" onclick="clearDateRange()" style="background:rgba(244,67,54,0.2); color:#F44336;"><i class="fas fa-times"></i> Clear</button></div><div class="filter-group"><span style="color:#888;">📊 Status:</span><button class="filter-btn status-filter-btn active" data-status="all" onclick="applyStatusFilter('all')">All</button><button class="filter-btn status-filter-btn" data-status="confirmed" onclick="applyStatusFilter('confirmed')">Confirmed</button><button class="filter-btn status-filter-btn" data-status="processing" onclick="applyStatusFilter('processing')">Processing</button><button class="filter-btn status-filter-btn" data-status="shipped" onclick="applyStatusFilter('shipped')">Shipped</button><button class="filter-btn status-filter-btn" data-status="delivered" onclick="applyStatusFilter('delivered')">Delivered</button><button class="filter-btn status-filter-btn" data-status="cancelled" onclick="applyStatusFilter('cancelled')">Cancelled</button></div></div><div class="orders-table"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th><th>Update Status</th><th>Actions</th></tr></thead><tbody id="ordersList"></tbody></table></div></div>
-                <div class="modal" id="orderModal"><div class="modal-content"><div class="modal-header"><h3><i class="fas fa-receipt"></i> Order Details</h3><button class="close-modal" onclick="closeModal()">&times;</button></div><div id="orderDetailContent"></div></div></div>
+                <div class="header">
+                    <div class="logo"><h1>VEDANTA ADMIN <span class="sync-badge"><i class="fas fa-cloud-upload-alt"></i> Cloud Sync</span></h1></div>
+                    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card"><i class="fas fa-box"></i><div class="stat-number" id="totalProducts">0</div><div class="stat-label">Total Products</div></div>
+                    <div class="stat-card"><i class="fas fa-shopping-cart"></i><div class="stat-number" id="totalOrders">0</div><div class="stat-label">Total Orders</div></div>
+                    <div class="stat-card"><i class="fas fa-rupee-sign"></i><div class="stat-number" id="totalRevenue">0</div><div class="stat-label">Total Revenue</div></div>
+                    <div class="stat-card"><i class="fas fa-users"></i><div class="stat-number" id="totalCustomers">0</div><div class="stat-label">Customers</div></div>
+                </div>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="products">📦 Products</button>
+                    <button class="tab-btn" data-tab="orders">📋 Orders</button>
+                </div>
+                <div class="tab-content active" id="productsTab">
+                    <div class="add-product-header">
+                        <h3><i class="fas fa-boxes"></i> All Products</h3>
+                        <button class="add-product-link" id="addProductBtn"><i class="fas fa-plus-circle"></i> Add New Product</button>
+                    </div>
+                    <div class="products-list" id="productsList"></div>
+                </div>
+                <div class="tab-content" id="ordersTab">
+                    <div class="order-filters">
+                        <div class="filter-group">
+                            <span style="color:#888;">📅 Quick Date:</span>
+                            <button class="filter-btn date-filter-btn active" data-filter="all" onclick="applyDateFilter('all')">All Orders</button>
+                            <button class="filter-btn date-filter-btn" data-filter="today" onclick="applyDateFilter('today')">Today</button>
+                            <button class="filter-btn date-filter-btn" data-filter="week" onclick="applyDateFilter('week')">This Week</button>
+                            <button class="filter-btn date-filter-btn" data-filter="month" onclick="applyDateFilter('month')">This Month</button>
+                        </div>
+                        <div class="filter-group">
+                            <span style="color:#888;">📅 Custom Range:</span>
+                            <div class="date-range-box" onclick="openDatePicker()">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span class="date-range-text" id="dateRangeText">Select Date Range</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <button class="filter-btn" onclick="clearDateRange()" style="background:rgba(244,67,54,0.2); color:#F44336;"><i class="fas fa-times"></i> Clear</button>
+                        </div>
+                        <div class="filter-group">
+                            <span style="color:#888;">📊 Status:</span>
+                            <button class="filter-btn status-filter-btn active" data-status="all" onclick="applyStatusFilter('all')">All</button>
+                            <button class="filter-btn status-filter-btn" data-status="confirmed" onclick="applyStatusFilter('confirmed')">Confirmed</button>
+                            <button class="filter-btn status-filter-btn" data-status="processing" onclick="applyStatusFilter('processing')">Processing</button>
+                            <button class="filter-btn status-filter-btn" data-status="shipped" onclick="applyStatusFilter('shipped')">Shipped</button>
+                            <button class="filter-btn status-filter-btn" data-status="delivered" onclick="applyStatusFilter('delivered')">Delivered</button>
+                            <button class="filter-btn status-filter-btn" data-status="cancelled" onclick="applyStatusFilter('cancelled')">Cancelled</button>
+                        </div>
+                    </div>
+                    <div class="orders-table">
+                        <table>
+                            <thead>
+                                <tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th><th>Update Status</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="ordersList"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal" id="orderModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-receipt"></i> Order Details</h3>
+                            <button class="close-modal" onclick="closeModal()">&times;</button>
+                        </div>
+                        <div id="orderDetailContent"></div>
+                    </div>
+                </div>
             `;
-            const datepickerModal = document.createElement('div'); datepickerModal.id = 'datepickerModal'; datepickerModal.className = 'datepicker-modal'; datepickerModal.innerHTML = `<div class="datepicker-content"><h3><i class="fas fa-calendar-alt"></i> Select Date Range</h3><div class="datepicker-input-group"><label>Start Date</label><div class="clickable-date-input" onclick="setStartDate()"><span id="startDateDisplay"><span class="placeholder-text">dd/mm/yyyy</span></span><i class="fas fa-calendar"></i></div></div><div class="datepicker-input-group"><label>End Date (Optional)</label><div class="clickable-date-input" onclick="setEndDate()"><span id="endDateDisplay"><span class="placeholder-text">dd/mm/yyyy (Optional)</span></span><i class="fas fa-calendar"></i></div></div><div class="datepicker-buttons"><button class="datepicker-cancel" onclick="closeDatePicker()">Cancel</button><button class="datepicker-apply" onclick="applyDateRange()">Apply</button></div></div>`;
+            
+            // Datepicker Modal
+            const datepickerModal = document.createElement('div'); 
+            datepickerModal.id = 'datepickerModal'; 
+            datepickerModal.className = 'datepicker-modal'; 
+            datepickerModal.innerHTML = `
+                <div class="datepicker-content">
+                    <h3><i class="fas fa-calendar-alt"></i> Select Date Range</h3>
+                    <div class="datepicker-input-group">
+                        <label>Start Date</label>
+                        <div class="clickable-date-input" onclick="setStartDate()">
+                            <span id="startDateDisplay"><span class="placeholder-text">dd/mm/yyyy</span></span>
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                    </div>
+                    <div class="datepicker-input-group">
+                        <label>End Date (Optional)</label>
+                        <div class="clickable-date-input" onclick="setEndDate()">
+                            <span id="endDateDisplay"><span class="placeholder-text">dd/mm/yyyy (Optional)</span></span>
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                    </div>
+                    <div class="datepicker-buttons">
+                        <button class="datepicker-cancel" onclick="closeDatePicker()">Cancel</button>
+                        <button class="datepicker-apply" onclick="applyDateRange()">Apply</button>
+                    </div>
+                </div>
+            `;
             document.body.appendChild(datepickerModal);
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.getElementById(`${btn.dataset.tab}Tab`).classList.add('active'); if (btn.dataset.tab === 'products') renderProducts(); if (btn.dataset.tab === 'orders') renderOrders(); }));
+            
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                    document.getElementById(`${btn.dataset.tab}Tab`).classList.add('active');
+                    if (btn.dataset.tab === 'products') renderProducts();
+                    if (btn.dataset.tab === 'orders') renderOrders();
+                });
+            });
+            
             document.getElementById('addProductBtn')?.addEventListener('click', goToAddProduct);
-            document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.removeItem('adminLoggedIn'); isLoggedIn = false; renderLoginPage(); });
-            renderProducts(); renderOrders(); updateStats();
+            document.getElementById('logoutBtn')?.addEventListener('click', () => {
+                localStorage.removeItem('adminLoggedIn');
+                isLoggedIn = false;
+                renderLoginPage();
+            });
+            
+            loadData();
         }
+        
         function renderLoginPage() {
-            document.getElementById('app').innerHTML = `<div class="login-container"><div class="login-card"><h2>VEDANTA ADMIN</h2><p>Enter credentials</p><div class="input-group"><label>Username</label><input type="text" id="adminUsername"></div><div class="input-group"><label>Password</label><input type="password" id="adminPassword"></div><button class="login-btn" id="loginBtn">Login</button><div class="error-msg" id="errorMsg">❌ Invalid</div></div></div>`;
-            document.getElementById('loginBtn').addEventListener('click', () => { const u = document.getElementById('adminUsername').value.trim(), p = document.getElementById('adminPassword').value.trim(); if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) { localStorage.setItem('adminLoggedIn','true'); showToast('✅ Login success!'); isLoggedIn = true; renderDashboard(); } else { document.getElementById('errorMsg').classList.add('show'); setTimeout(()=>document.getElementById('errorMsg').classList.remove('show'),2000); } });
+            document.getElementById('app').innerHTML = `
+                <div class="login-container">
+                    <div class="login-card">
+                        <h2>VEDANTA ADMIN</h2>
+                        <p>Enter credentials</p>
+                        <div class="input-group">
+                            <label>Username</label>
+                            <input type="text" id="adminUsername">
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input type="password" id="adminPassword">
+                        </div>
+                        <button class="login-btn" id="loginBtn">Login</button>
+                        <div class="error-msg" id="errorMsg">❌ Invalid credentials</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                const u = document.getElementById('adminUsername').value.trim();
+                const p = document.getElementById('adminPassword').value.trim();
+                if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    showToast('✅ Login success! Cloud sync enabled');
+                    isLoggedIn = true;
+                    renderDashboard();
+                } else {
+                    document.getElementById('errorMsg').classList.add('show');
+                    setTimeout(() => document.getElementById('errorMsg').classList.remove('show'), 2000);
+                }
+            });
+        }
+        
+        // Make functions global
+        window.closeModal = closeModal;
+        window.viewOrderDetails = viewOrderDetails;
+        window.updateOrderStatus = updateOrderStatus;
+        window.editProduct = editProduct;
+        window.deleteProduct = deleteProduct;
+        window.deleteOrder = deleteOrder;
+        window.goToAddProduct = goToAddProduct;
+        window.applyDateFilter = applyDateFilter;
+        window.applyStatusFilter = applyStatusFilter;
+        window.openDatePicker = openDatePicker;
+        window.closeDatePicker = closeDatePicker;
+        window.applyDateRange = applyDateRange;
+        window.clearDateRange = clearDateRange;
+        window.setStartDate = setStartDate;
+        window.setEndDate = setEndDate;
+        
+        // Initialize
+        if (isLoggedIn) {
+            renderDashboard();
+        } else {
+            renderLoginPage();
+        }
+        
+        // Real-time listener for orders (auto-refresh when new order comes)
+        if (typeof db !== 'undefined') {
+            db.collection('orders').onSnapshot(() => {
+                if (isLoggedIn) {
+                    loadData();
+                }
+            });
+            db.collection('products').onSnapshot(() => {
+                if (isLoggedIn) {
+                    loadData();
+                }
+            });
         }
     </script>
 </body>
