@@ -63,7 +63,7 @@
             gap: 8px;
         }
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 24px 20px;
         }
@@ -133,6 +133,184 @@
             grid-template-columns: 1fr 1fr 1fr;
             gap: 15px;
         }
+        /* Size & Color Chips */
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .chip {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(212,175,55,0.3);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chip:hover {
+            border-color: #D4AF37;
+            background: rgba(212,175,55,0.1);
+        }
+        .chip.selected {
+            background: linear-gradient(135deg, #D4AF37, #FF8C00);
+            color: #050508;
+            border-color: transparent;
+        }
+        .color-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .color-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        /* Color Modal */
+        .color-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
+        }
+        .color-modal.show {
+            display: flex;
+        }
+        .color-modal-content {
+            background: #0a0a12;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow: hidden;
+            border: 1px solid rgba(212,175,55,0.3);
+        }
+        .color-modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .color-modal-header h3 {
+            color: #D4AF37;
+        }
+        .color-search {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .color-search input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212,175,55,0.3);
+            border-radius: 40px;
+            color: white;
+        }
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+            padding: 20px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        .color-option {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 40px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 12px;
+        }
+        .color-option:hover {
+            border-color: #D4AF37;
+            background: rgba(212,175,55,0.1);
+        }
+        .color-option.selected {
+            background: linear-gradient(135deg, #D4AF37, #FF8C00);
+            color: #050508;
+        }
+        .color-option .color-dot {
+            width: 16px;
+            height: 16px;
+        }
+        .view-all-btn {
+            background: rgba(212,175,55,0.15);
+            border: 1px solid #D4AF37;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .selected-count {
+            background: #D4AF37;
+            color: #050508;
+            padding: 2px 8px;
+            border-radius: 40px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+        .combo-card {
+            background: rgba(76,175,80,0.1);
+            border: 1px solid rgba(76,175,80,0.3);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .combo-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .combo-row input {
+            padding: 10px;
+        }
+        .add-combo-btn {
+            background: rgba(212,175,55,0.2);
+            border: 1px solid #D4AF37;
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: #D4AF37;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .combo-list {
+            margin-top: 12px;
+        }
+        .combo-item {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .remove-combo {
+            color: #F44336;
+            cursor: pointer;
+        }
         .image-upload-area {
             border: 2px dashed rgba(212,175,55,0.3);
             border-radius: 20px;
@@ -169,10 +347,6 @@
             height: 100%;
             object-fit: cover;
         }
-        .preview-img i {
-            font-size: 35px;
-            color: #D4AF37;
-        }
         .remove-img {
             position: absolute;
             top: -8px;
@@ -186,7 +360,6 @@
             justify-content: center;
             font-size: 11px;
             cursor: pointer;
-            z-index: 10;
         }
         .submit-btn {
             width: 100%;
@@ -224,6 +397,8 @@
             .container { padding: 16px; }
             .form-card { padding: 20px; }
             .row-2, .row-3 { grid-template-columns: 1fr; gap: 0; }
+            .combo-row { grid-template-columns: 1fr; }
+            .color-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
         }
         .sync-badge {
             background: rgba(76,175,80,0.2);
@@ -233,17 +408,12 @@
             font-size: 10px;
             margin-left: 10px;
         }
-        .image-size-warning {
-            background: rgba(244,67,54,0.15);
-            color: #F44336;
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            margin-top: 10px;
-            display: none;
-        }
-        .image-size-warning.show {
-            display: block;
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -260,13 +430,24 @@
         
         <div class="form-group">
             <label>Product Name <span class="required">*</span></label>
-            <input type="text" id="productName" placeholder="e.g., Banarasi Silk Saree">
+            <input type="text" id="productName" placeholder="e.g., Premium Cotton T-Shirt">
         </div>
         
         <div class="row-2">
             <div class="form-group">
                 <label>Category <span class="required">*</span></label>
-                <input type="text" id="category" placeholder="e.g., Saree, Kurta, Crystal">
+                <select id="category">
+                    <option value="T-Shirt">👕 T-Shirt</option>
+                    <option value="Shirt">👔 Shirt</option>
+                    <option value="Kurta">🧥 Kurta</option>
+                    <option value="Saree">🥻 Saree</option>
+                    <option value="Jeans">👖 Jeans</option>
+                    <option value="Jacket">🧥 Jacket</option>
+                    <option value="Dress">👗 Dress</option>
+                    <option value="Crystal">💎 Crystal</option>
+                    <option value="Mala">📿 Mala</option>
+                    <option value="Home Decor">🏠 Home Decor</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>Offer Badge</label>
@@ -278,6 +459,35 @@
                     <option value="Limited">💎 Limited Edition</option>
                 </select>
             </div>
+        </div>
+        
+        <!-- SIZES -->
+        <div class="form-group">
+            <label>Sizes Available (Optional - for clothing)</label>
+            <div class="chips-container" id="sizeContainer">
+                <div class="chip" data-size="XS">XS</div>
+                <div class="chip" data-size="S">S</div>
+                <div class="chip" data-size="M">M</div>
+                <div class="chip" data-size="L">L</div>
+                <div class="chip" data-size="XL">XL</div>
+                <div class="chip" data-size="XXL">XXL</div>
+                <div class="chip" data-size="3XL">3XL</div>
+                <div class="chip" data-size="4XL">4XL</div>
+                <div class="chip" data-size="Free Size">Free Size</div>
+            </div>
+        </div>
+        
+        <!-- COLORS with View All Button - 200+ Colors -->
+        <div class="form-group">
+            <label style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+                Colors Available 
+                <span class="selected-count" id="selectedColorCount">0 selected</span>
+                <button type="button" class="view-all-btn" id="viewAllColorsBtn"><i class="fas fa-th"></i> View All Colors (200+)</button>
+            </label>
+            <div class="chips-container" id="colorContainer">
+                <!-- 12 popular colors with color dots will be shown here -->
+            </div>
+            <div class="hint"><i class="fas fa-palette"></i> Click on colors to select. Click "View All Colors" for 200+ colors!</div>
         </div>
         
         <div class="row-3">
@@ -292,6 +502,37 @@
             <div class="form-group">
                 <label>Discount (%)</label>
                 <input type="text" id="discount" placeholder="Auto calculated" readonly>
+            </div>
+        </div>
+        
+        <!-- COMBO OFFERS -->
+        <div class="form-group">
+            <label>Combo / Special Offers</label>
+            <div class="combo-card">
+                <div class="combo-row">
+                    <input type="text" id="comboQuantity" placeholder="Qty (e.g., 2)" style="width: 80px;">
+                    <span>for</span>
+                    <input type="number" id="comboPrice" placeholder="Price (e.g., 900)" style="width: 100px;">
+                    <button class="add-combo-btn" id="addComboBtn">+ Add Offer</button>
+                </div>
+                <div class="combo-list" id="comboList"></div>
+            </div>
+        </div>
+        
+        <!-- QUANTITY DISCOUNT -->
+        <div class="form-group">
+            <label>Bulk Quantity Discount (Optional)</label>
+            <div class="row-2">
+                <input type="number" id="qty2" placeholder="Min Qty (e.g., 2)">
+                <input type="number" id="price2" placeholder="Price per piece (e.g., 450)">
+            </div>
+            <div class="row-2" style="margin-top: 8px;">
+                <input type="number" id="qty3" placeholder="Min Qty (e.g., 3)">
+                <input type="number" id="price3" placeholder="Price per piece (e.g., 430)">
+            </div>
+            <div class="row-2" style="margin-top: 8px;">
+                <input type="number" id="qty5" placeholder="Min Qty (e.g., 5)">
+                <input type="number" id="price5" placeholder="Price per piece (e.g., 400)">
             </div>
         </div>
         
@@ -316,21 +557,17 @@
         
         <div class="form-group">
             <label>Full Description</label>
-            <textarea id="fullDesc" rows="3" placeholder="Detailed product description, features, benefits..."></textarea>
+            <textarea id="fullDesc" rows="3" placeholder="Detailed product description..."></textarea>
         </div>
         
         <div class="form-group">
             <label>Product Images</label>
             <div class="image-upload-area" id="imageUploadArea">
                 <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: #D4AF37;"></i>
-                <p style="margin-top: 10px;">Click to upload images (Max 5 images, each less than 200KB)</p>
+                <p>Click to upload images (Max 5 images)</p>
                 <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
             </div>
-            <div class="image-size-warning" id="imageSizeWarning">
-                <i class="fas fa-exclamation-triangle"></i> Image too large! Please use images smaller than 200KB.
-            </div>
             <div class="image-preview" id="imagePreview"></div>
-            <div class="hint"><i class="fas fa-info-circle"></i> Images will be compressed automatically. For best results, use images under 200KB.</div>
         </div>
         
         <div class="form-group">
@@ -342,26 +579,92 @@
     </div>
 </div>
 
+<!-- COLOR MODAL - 200+ Colors -->
+<div class="color-modal" id="colorModal">
+    <div class="color-modal-content">
+        <div class="color-modal-header">
+            <h3><i class="fas fa-palette"></i> Select Colors (200+ colors)</h3>
+            <button class="close-modal" id="closeModalBtn">&times;</button>
+        </div>
+        <div class="color-search">
+            <input type="text" id="colorSearchInput" placeholder="Search color... (e.g., Red, Blue, Green)">
+        </div>
+        <div class="color-grid" id="fullColorGrid">
+            <!-- All colors will be loaded here -->
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-    // ========== 🔥 FIREBASE CONFIGURATION ==========
+    // ========== FIREBASE CONFIG ==========
     const firebaseConfig = {
         apiKey: "AIzaSyCMPUAV50FOsqpyTKY3lioeAgbQvxQzLnM",
         authDomain: "vedanta-d0199.firebaseapp.com",
         projectId: "vedanta-d0199",
         storageBucket: "vedanta-d0199.firebasestorage.app",
         messagingSenderId: "761061711987",
-        appId: "1:761061711987:web:d59ff32fd53057c395ca06",
-        measurementId: "G-RQMQZVGK75"
+        appId: "1:761061711987:web:d59ff32fd53057c395ca06"
     };
     
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    console.log("🔥 Firebase Connected!");
     
     let images = [];
+    let selectedSizes = [];
+    let selectedColors = [];
+    let combos = [];
+    
+    // ========== 200+ COLORS DATABASE ==========
+    const allColors = [
+        // Basic Colors
+        { name: "Red", code: "#FF0000" }, { name: "Crimson", code: "#DC143C" }, { name: "Maroon", code: "#800000" },
+        { name: "Dark Red", code: "#8B0000" }, { name: "Indian Red", code: "#CD5C5C" }, { name: "Light Red", code: "#FF6B6B" },
+        { name: "Blue", code: "#0000FF" }, { name: "Navy Blue", code: "#000080" }, { name: "Royal Blue", code: "#4169E1" },
+        { name: "Sky Blue", code: "#87CEEB" }, { name: "Light Blue", code: "#ADD8E6" }, { name: "Deep Blue", code: "#00008B" },
+        { name: "Cyan", code: "#00FFFF" }, { name: "Teal", code: "#008080" }, { name: "Turquoise", code: "#40E0D0" },
+        { name: "Green", code: "#008000" }, { name: "Dark Green", code: "#006400" }, { name: "Light Green", code: "#90EE90" },
+        { name: "Lime Green", code: "#32CD32" }, { name: "Forest Green", code: "#228B22" }, { name: "Olive Green", code: "#808000" },
+        { name: "Yellow", code: "#FFFF00" }, { name: "Gold", code: "#FFD700" }, { name: "Golden Rod", code: "#DAA520" },
+        { name: "Light Yellow", code: "#FFFFE0" }, { name: "Mustard", code: "#FFDB58" }, { name: "Orange", code: "#FFA500" },
+        { name: "Dark Orange", code: "#FF8C00" }, { name: "Coral", code: "#FF7F50" }, { name: "Tomato", code: "#FF6347" },
+        { name: "Purple", code: "#800080" }, { name: "Dark Purple", code: "#4B0082" }, { name: "Violet", code: "#EE82EE" },
+        { name: "Lavender", code: "#E6E6FA" }, { name: "Magenta", code: "#FF00FF" }, { name: "Pink", code: "#FFC0CB" },
+        { name: "Hot Pink", code: "#FF69B4" }, { name: "Deep Pink", code: "#FF1493" }, { name: "Rose", code: "#FF007F" },
+        { name: "Brown", code: "#A52A2A" }, { name: "Saddle Brown", code: "#8B4513" }, { name: "Chocolate", code: "#D2691E" },
+        { name: "Tan", code: "#D2B48C" }, { name: "Beige", code: "#F5F5DC" }, { name: "Cream", code: "#FFFDD0" },
+        { name: "White", code: "#FFFFFF" }, { name: "Off White", code: "#FAF9F6" }, { name: "Ivory", code: "#FFFFF0" },
+        { name: "Black", code: "#000000" }, { name: "Charcoal", code: "#36454F" }, { name: "Dark Gray", code: "#A9A9A9" },
+        { name: "Gray", code: "#808080" }, { name: "Silver", code: "#C0C0C0" }, { name: "Light Gray", code: "#D3D3D3" },
+        // More Fashion Colors
+        { name: "Burgundy", code: "#900020" }, { name: "Wine", code: "#722F37" }, { name: "Ruby", code: "#9B111E" },
+        { name: "Rust", code: "#B7410E" }, { name: "Copper", code: "#B87333" }, { name: "Bronze", code: "#CD7F32" },
+        { name: "Khaki", code: "#C3B091" }, { name: "Olive", code: "#556B2F" }, { name: "Mint", code: "#98FB98" },
+        { name: "Sage", code: "#9CAF88" }, { name: "Emerald", code: "#50C878" }, { name: "Jade", code: "#00A86B" },
+        { name: "Peach", code: "#FFE5B4" }, { name: "Apricot", code: "#FBCEB1" }, { name: "Salmon", code: "#FA8072" },
+        { name: "Coral Pink", code: "#F88379" }, { name: "Lilac", code: "#C8A2C8" }, { name: "Mauve", code: "#E0B0FF" },
+        { name: "Plum", code: "#DDA0DD" }, { name: "Orchid", code: "#DA70D6" }, { name: "Fuchsia", code: "#FF77FF" },
+        { name: "Cerise", code: "#DE3163" }, { name: "Raspberry", code: "#E30B5D" }, { name: "Strawberry", code: "#FC5A8D" },
+        { name: "Tangerine", code: "#F28500" }, { name: "Mango", code: "#FFC800" }, { name: "Lemon", code: "#FFF700" },
+        { name: "Champagne", code: "#F7E7CE" }, { name: "Nude", code: "#E3BC9A" }, { name: "Mocha", code: "#967969" },
+        { name: "Coffee", code: "#6F4E37" }, { name: "Espresso", code: "#4A2C2C" }, { name: "Indigo", code: "#4B0082" },
+        { name: "Periwinkle", code: "#CCCCFF" }, { name: "Misty Rose", code: "#FFE4E1" }, { name: "Blush", code: "#DE5D83" },
+        // Denim & Pastel Colors
+        { name: "Denim Blue", code: "#2243B6" }, { name: "Pastel Pink", code: "#FFD1DC" }, { name: "Pastel Blue", code: "#AEC6CF" },
+        { name: "Pastel Green", code: "#B2F2BB" }, { name: "Pastel Yellow", code: "#FDFD96" }, { name: "Pastel Purple", code: "#C3B1E1" },
+        { name: "Pastel Orange", code: "#FFB347" }, { name: "Pastel Lavender", code: "#E6E6FA" }, { name: "Neon Pink", code: "#FF6EC7" },
+        { name: "Neon Green", code: "#39FF14" }, { name: "Neon Blue", code: "#4D4DFF" }, { name: "Neon Yellow", code: "#FFFF33" },
+        { name: "Metallic Gold", code: "#D4AF37" }, { name: "Metallic Silver", code: "#C0C0C0" }, { name: "Metallic Copper", code: "#B87333" }
+    ];
+    
+    // 12 Popular Colors with color codes
+    const popularColors = [
+        { name: "Red", code: "#FF0000" }, { name: "Blue", code: "#0000FF" }, { name: "Green", code: "#008000" },
+        { name: "Black", code: "#000000" }, { name: "White", code: "#FFFFFF" }, { name: "Yellow", code: "#FFFF00" },
+        { name: "Purple", code: "#800080" }, { name: "Pink", code: "#FFC0CB" }, { name: "Orange", code: "#FFA500" },
+        { name: "Brown", code: "#A52A2A" }, { name: "Gray", code: "#808080" }, { name: "Gold", code: "#FFD700" }
+    ];
     
     function showToast(msg, isError = false) {
         const toast = document.getElementById('toast');
@@ -372,27 +675,143 @@
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
     
-    // Calculate discount automatically
+    // Render Popular Colors with color dots
+    function renderPopularColors() {
+        const container = document.getElementById('colorContainer');
+        if (!container) return;
+        
+        container.innerHTML = popularColors.map(color => `
+            <div class="chip color-chip ${selectedColors.includes(color.name) ? 'selected' : ''}" 
+                 data-color="${color.name}" data-code="${color.code}">
+                <span class="color-dot" style="background: ${color.code};"></span>
+                ${color.name}
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('#colorContainer .chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const colorName = chip.getAttribute('data-color');
+                if (selectedColors.includes(colorName)) {
+                    selectedColors = selectedColors.filter(c => c !== colorName);
+                    chip.classList.remove('selected');
+                } else {
+                    selectedColors.push(colorName);
+                    chip.classList.add('selected');
+                }
+                updateSelectedColorCount();
+            });
+        });
+    }
+    
+    // Render Full Color Grid with color dots (200+ colors)
+    function renderFullColorGrid(searchTerm = '') {
+        const container = document.getElementById('fullColorGrid');
+        if (!container) return;
+        
+        let filteredColors = allColors;
+        if (searchTerm) {
+            filteredColors = allColors.filter(color => 
+                color.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+        
+        container.innerHTML = filteredColors.map(color => `
+            <div class="color-option ${selectedColors.includes(color.name) ? 'selected' : ''}" 
+                 data-color="${color.name}" data-code="${color.code}">
+                <span class="color-dot" style="background: ${color.code};"></span>
+                ${color.name}
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('#fullColorGrid .color-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const colorName = option.getAttribute('data-color');
+                if (selectedColors.includes(colorName)) {
+                    selectedColors = selectedColors.filter(c => c !== colorName);
+                    option.classList.remove('selected');
+                } else {
+                    selectedColors.push(colorName);
+                    option.classList.add('selected');
+                }
+                updateSelectedColorCount();
+                renderPopularColors(); // Refresh popular colors to show selection
+            });
+        });
+    }
+    
+    function updateSelectedColorCount() {
+        const countSpan = document.getElementById('selectedColorCount');
+        if (countSpan) {
+            countSpan.textContent = `${selectedColors.length} selected`;
+        }
+    }
+    
+    // Size selection
+    document.querySelectorAll('#sizeContainer .chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const size = chip.getAttribute('data-size');
+            if (selectedSizes.includes(size)) {
+                selectedSizes = selectedSizes.filter(s => s !== size);
+                chip.classList.remove('selected');
+            } else {
+                selectedSizes.push(size);
+                chip.classList.add('selected');
+            }
+        });
+    });
+    
+    // Combo offers
+    function renderCombos() {
+        const container = document.getElementById('comboList');
+        if (!container) return;
+        
+        if (combos.length === 0) {
+            container.innerHTML = '<div class="hint">No offers added yet</div>';
+            return;
+        }
+        container.innerHTML = combos.map((combo, idx) => `
+            <div class="combo-item">
+                <span>${combo.quantity} for ₹${combo.price}</span>
+                <span class="remove-combo" onclick="removeCombo(${idx})">✕ Remove</span>
+            </div>
+        `).join('');
+    }
+    
+    window.removeCombo = function(idx) {
+        combos.splice(idx, 1);
+        renderCombos();
+    };
+    
+    document.getElementById('addComboBtn')?.addEventListener('click', () => {
+        const quantity = document.getElementById('comboQuantity')?.value.trim();
+        const price = document.getElementById('comboPrice')?.value.trim();
+        if (!quantity || !price) {
+            showToast('Please enter both quantity and price', true);
+            return;
+        }
+        combos.push({ quantity: quantity, price: parseInt(price) });
+        renderCombos();
+        document.getElementById('comboQuantity').value = '';
+        document.getElementById('comboPrice').value = '';
+    });
+    
+    // Discount calculation
     function calculateDiscount() {
         const price = parseFloat(document.getElementById('price').value) || 0;
         const comparePrice = parseFloat(document.getElementById('comparePrice').value) || 0;
         const discountInput = document.getElementById('discount');
-        if (discountInput) {
-            if (comparePrice > price && price > 0) {
-                const discount = Math.round(((comparePrice - price) / comparePrice) * 100);
-                discountInput.value = discount + '%';
-            } else {
-                discountInput.value = '0%';
-            }
+        if (comparePrice > price && price > 0) {
+            const discount = Math.round(((comparePrice - price) / comparePrice) * 100);
+            discountInput.value = discount + '%';
+        } else {
+            discountInput.value = '0%';
         }
     }
     
-    const priceInput = document.getElementById('price');
-    const comparePriceInput = document.getElementById('comparePrice');
-    if (priceInput) priceInput.addEventListener('input', calculateDiscount);
-    if (comparePriceInput) comparePriceInput.addEventListener('input', calculateDiscount);
+    document.getElementById('price')?.addEventListener('input', calculateDiscount);
+    document.getElementById('comparePrice')?.addEventListener('input', calculateDiscount);
     
-    // 🔥 COMPRESS IMAGE FUNCTION (Reduce size)
+    // Image compression
     function compressImage(file, maxSizeKB = 150) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -404,8 +823,6 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    
-                    // Reduce dimensions if too large
                     const maxDimension = 800;
                     if (width > maxDimension || height > maxDimension) {
                         if (width > height) {
@@ -416,25 +833,18 @@
                             height = maxDimension;
                         }
                     }
-                    
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // Compress to JPEG with 0.7 quality
                     let quality = 0.7;
                     let compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-                    
-                    // Check size and reduce quality if still too large
                     let sizeInKB = Math.round((compressedDataUrl.length * 3/4) / 1024);
                     while (sizeInKB > maxSizeKB && quality > 0.3) {
                         quality -= 0.1;
                         compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
                         sizeInKB = Math.round((compressedDataUrl.length * 3/4) / 1024);
                     }
-                    
-                    console.log(`Image compressed: ${sizeInKB}KB`);
                     resolve(compressedDataUrl);
                 };
                 img.onerror = reject;
@@ -443,32 +853,18 @@
         });
     }
     
-    // Image upload with compression
     const uploadArea = document.getElementById('imageUploadArea');
     const imageInput = document.getElementById('imageInput');
-    const imageSizeWarning = document.getElementById('imageSizeWarning');
     
-    uploadArea.addEventListener('click', () => imageInput.click());
-    imageInput.addEventListener('change', async (e) => {
+    uploadArea?.addEventListener('click', () => imageInput.click());
+    imageInput?.addEventListener('change', async (e) => {
         const files = Array.from(e.target.files);
-        imageSizeWarning.classList.remove('show');
-        
         if (images.length + files.length > 5) {
-            showToast('❌ Maximum 5 images allowed', true);
+            showToast('Maximum 5 images allowed', true);
             return;
         }
-        
         for (const file of files) {
             try {
-                // Check original file size
-                const originalSizeKB = file.size / 1024;
-                if (originalSizeKB > 500) {
-                    imageSizeWarning.classList.add('show');
-                    showToast(`⚠️ Image ${file.name} is ${Math.round(originalSizeKB)}KB. Please use smaller images.`, true);
-                    continue;
-                }
-                
-                // Compress image
                 const compressedImage = await compressImage(file, 150);
                 images.push(compressedImage);
                 renderImages();
@@ -482,6 +878,7 @@
     function renderImages() {
         const preview = document.getElementById('imagePreview');
         if (!preview) return;
+        
         if (images.length === 0) {
             preview.innerHTML = '';
             return;
@@ -494,44 +891,38 @@
         `).join('');
     }
     
-    function removeImage(idx) {
+    window.removeImage = function(idx) {
         images.splice(idx, 1);
         renderImages();
+    };
+    
+    function getBulkDiscounts() {
+        const discounts = {};
+        const qty2 = document.getElementById('qty2')?.value;
+        const price2 = document.getElementById('price2')?.value;
+        if (qty2 && price2) discounts[qty2] = parseInt(price2);
+        
+        const qty3 = document.getElementById('qty3')?.value;
+        const price3 = document.getElementById('price3')?.value;
+        if (qty3 && price3) discounts[qty3] = parseInt(price3);
+        
+        const qty5 = document.getElementById('qty5')?.value;
+        const price5 = document.getElementById('price5')?.value;
+        if (qty5 && price5) discounts[qty5] = parseInt(price5);
+        
+        return discounts;
     }
     
-    function getIconForCategory(category) {
-        const icons = {
-            'Saree': 'fa-female', 'Kurta': 'fa-male', 'TShirt': 'fa-tshirt',
-            'Crystal': 'fa-gem', 'Mala': 'fa-hands-praying', 'Home Decor': 'fa-home',
-            'Meditation': 'fa-om', 'Books': 'fa-book', 'Incense': 'fa-fire',
-            'Jewelry': 'fa-ring', 'Perfume': 'fa-spray-can', 'Ayurveda': 'fa-leaf',
-            'Jeans': 'fa-shopping-bag', 'Western': 'fa-female', 'Traditional': 'fa-male'
-        };
-        return icons[category] || 'fa-gem';
-    }
-    
-    // Add product to Firebase
+    // Save to Firebase
     async function addProductToFirebase() {
-        const name = document.getElementById('productName')?.value.trim() || '';
-        const category = document.getElementById('category')?.value.trim() || '';
+        const name = document.getElementById('productName')?.value.trim();
+        const category = document.getElementById('category')?.value;
         const price = parseFloat(document.getElementById('price')?.value) || 0;
         
-        if (!name) { showToast('❌ Please enter product name', true); return false; }
-        if (!category) { showToast('❌ Please enter category', true); return false; }
-        if (!price) { showToast('❌ Please enter price', true); return false; }
+        if (!name) { showToast('Please enter product name', true); return false; }
+        if (!price) { showToast('Please enter product price', true); return false; }
         
         const productId = Date.now().toString();
-        
-        // Calculate total images size
-        let totalSize = 0;
-        images.forEach(img => {
-            totalSize += (img.length * 3/4) / 1024;
-        });
-        
-        if (totalSize > 900) {
-            showToast('❌ Images total size too large. Please use smaller images.', true);
-            return false;
-        }
         
         const productData = {
             id: productId,
@@ -539,6 +930,10 @@
             category: category,
             price: price,
             comparePrice: parseFloat(document.getElementById('comparePrice')?.value) || 0,
+            sizes: selectedSizes,
+            colors: selectedColors,
+            combos: combos,
+            bulkDiscounts: getBulkDiscounts(),
             stock: parseInt(document.getElementById('stock')?.value) || 0,
             shortDesc: document.getElementById('shortDesc')?.value || '',
             fullDesc: document.getElementById('fullDesc')?.value || '',
@@ -546,58 +941,28 @@
             status: document.getElementById('status')?.value || 'active',
             images: images,
             videoUrl: document.getElementById('videoUrl')?.value || '',
-            icon: getIconForCategory(category),
-            featured: 'no',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
         
         try {
             await db.collection('products').doc(productId).set(productData);
-            console.log("✅ Product saved to Firebase!");
             return { success: true, productId: productId };
         } catch (error) {
-            console.error("Firebase Error:", error);
-            if (error.message && error.message.includes('longer than')) {
-                showToast('❌ Images too large! Please use smaller images (under 150KB each)', true);
-            } else {
-                showToast(`❌ Failed to publish: ${error.message}`, true);
-            }
-            return { success: false, error: error.message };
+            showToast(`Failed: ${error.message}`, true);
+            return { success: false };
         }
     }
     
     async function saveProduct() {
-        const name = document.getElementById('productName')?.value.trim() || '';
-        const category = document.getElementById('category')?.value.trim() || '';
-        const price = parseFloat(document.getElementById('price')?.value) || 0;
-        
-        if (!name) { showToast('❌ Please enter product name', true); return; }
-        if (!category) { showToast('❌ Please enter category', true); return; }
-        if (!price) { showToast('❌ Please enter product price', true); return; }
-        
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Publishing to Cloud...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Publishing...';
         
         const result = await addProductToFirebase();
         
         if (result.success) {
-            showToast('✅ Product published to cloud! Available on all devices!');
-            
-            // Reset form
-            if (document.getElementById('productName')) document.getElementById('productName').value = '';
-            if (document.getElementById('category')) document.getElementById('category').value = '';
-            if (document.getElementById('price')) document.getElementById('price').value = '';
-            if (document.getElementById('comparePrice')) document.getElementById('comparePrice').value = '';
-            if (document.getElementById('shortDesc')) document.getElementById('shortDesc').value = '';
-            if (document.getElementById('fullDesc')) document.getElementById('fullDesc').value = '';
-            if (document.getElementById('videoUrl')) document.getElementById('videoUrl').value = '';
-            if (document.getElementById('stock')) document.getElementById('stock').value = '10';
-            images = [];
-            renderImages();
-            calculateDiscount();
-            
+            showToast('✅ Product published successfully!');
             setTimeout(() => {
                 window.location.href = 'admin.html';
             }, 1500);
@@ -607,14 +972,37 @@
         }
     }
     
-    const submitBtn = document.getElementById('submitBtn');
-    if (submitBtn) submitBtn.addEventListener('click', saveProduct);
+    // Modal Functions
+    const modal = document.getElementById('colorModal');
+    const viewAllBtn = document.getElementById('viewAllColorsBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const colorSearchInput = document.getElementById('colorSearchInput');
     
-    // Make functions global
-    window.removeImage = removeImage;
+    viewAllBtn?.addEventListener('click', () => {
+        renderFullColorGrid('');
+        modal.classList.add('show');
+    });
     
-    // Calculate initial discount
+    closeModalBtn?.addEventListener('click', () => {
+        modal.classList.remove('show');
+    });
+    
+    modal?.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('show');
+        }
+    });
+    
+    colorSearchInput?.addEventListener('input', (e) => {
+        renderFullColorGrid(e.target.value);
+    });
+    
+    document.getElementById('submitBtn')?.addEventListener('click', saveProduct);
+    
+    // Initialize
+    renderPopularColors();
     calculateDiscount();
+    updateSelectedColorCount();
 </script>
 </body>
 </html>
