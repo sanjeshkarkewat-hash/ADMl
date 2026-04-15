@@ -98,6 +98,126 @@
         .tab-content { display: none; padding: 0 20px 20px; }
         .tab-content.active { display: block; }
         
+        /* Order Filters */
+        .order-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 20px;
+        }
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-btn {
+            background: rgba(20,20,30,0.8);
+            border: 1px solid rgba(212,175,55,0.2);
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: #DDD;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: #D4AF37;
+            color: #050508;
+        }
+        .date-range-box {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212,175,55,0.3);
+            border-radius: 40px;
+            padding: 6px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .date-range-box:hover {
+            border-color: #D4AF37;
+            background: rgba(212,175,55,0.1);
+        }
+        .date-range-box i {
+            color: #D4AF37;
+            font-size: 14px;
+        }
+        .date-range-text {
+            font-size: 12px;
+            color: #DDD;
+        }
+        .datepicker-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        .datepicker-modal.show { display: flex; }
+        .datepicker-content {
+            background: rgba(15,15,22,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid #D4AF37;
+        }
+        .datepicker-content h3 { color: #D4AF37; margin-bottom: 20px; }
+        .datepicker-input-group { margin-bottom: 20px; text-align: left; }
+        .datepicker-input-group label { display: block; margin-bottom: 8px; font-size: 13px; color: #CCC; }
+        .clickable-date-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212,175,55,0.3);
+            border-radius: 16px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .clickable-date-input:hover { border-color: #D4AF37; background: rgba(212,175,55,0.1); }
+        .clickable-date-input .placeholder-text { color: #888; }
+        .clickable-date-input .selected-date { color: #D4AF37; }
+        .clickable-date-input i { color: #D4AF37; }
+        .datepicker-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .datepicker-apply {
+            flex: 1;
+            background: linear-gradient(135deg, #D4AF37, #FF8C00);
+            border: none;
+            padding: 12px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #050508;
+        }
+        .datepicker-cancel {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            padding: 12px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+        }
+        
         .products-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -367,9 +487,7 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .main-color-item:hover {
-            transform: scale(1.1);
-        }
+        .main-color-item:hover { transform: scale(1.1); }
         .main-color-circle {
             width: 45px;
             height: 45px;
@@ -383,6 +501,7 @@
             color: #D4AF37;
             font-weight: 500;
         }
+        
         .orders-table { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
@@ -420,7 +539,9 @@
         }
         .view-details { background: rgba(212,175,55,0.15); color: #D4AF37; }
         .delete-order-btn { background: rgba(244,67,54,0.2); color: #F44336; }
-        .modal {
+        
+        /* Order Details Modal */
+        .order-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -432,8 +553,8 @@
             align-items: center;
             justify-content: center;
         }
-        .modal.show { display: flex; }
-        .modal-content {
+        .order-modal.show { display: flex; }
+        .order-modal-content {
             background: rgba(15,15,22,0.95);
             backdrop-filter: blur(15px);
             border-radius: 32px;
@@ -444,6 +565,73 @@
             overflow-y: auto;
             border: 1px solid rgba(212,175,55,0.3);
         }
+        .order-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .close-order-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .order-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .order-product-img {
+            width: 70px;
+            height: 70px;
+            background: #0E0E14;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .order-product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .order-product-img i {
+            font-size: 35px;
+            color: #D4AF37;
+        }
+        .order-item-with-img {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .order-item-info { flex: 1; }
+        .order-item-info h4 { font-size: 15px; margin-bottom: 5px; }
+        .order-item-info p { font-size: 12px; color: #888; margin: 3px 0; }
+        .order-item-size {
+            display: inline-block;
+            background: rgba(212,175,55,0.15);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #D4AF37;
+            margin-top: 5px;
+        }
+        .order-item-price {
+            font-weight: 700;
+            color: #D4AF37;
+            font-size: 15px;
+            text-align: right;
+            min-width: 100px;
+        }
+        
         .toast {
             position: fixed;
             bottom: 30px;
@@ -532,18 +720,11 @@
             gap: 8px;
             font-size: 14px;
         }
-        .btn-link {
-            background: none;
-            border: none;
-            color: #D4AF37;
-            cursor: pointer;
-            font-size: 12px;
-            text-decoration: underline;
-        }
         @media (max-width: 700px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .form-row { grid-template-columns: 1fr; }
             .add-section { flex-direction: column; align-items: stretch; }
+            .order-filters { flex-direction: column; align-items: stretch; }
             .main-color-circle { width: 35px; height: 35px; }
             .main-color-name { font-size: 8px; }
         }
@@ -573,86 +754,48 @@
         let products = [];
         let orders = [];
         let currentEditProduct = null;
-        let showFullColorGrid = false;
+        
+        // Filter states
+        let currentDateFilter = 'all';
+        let currentStatusFilter = 'all';
+        let customStartDate = '';
+        let customEndDate = '';
+        let tempStartDate = '';
+        let tempEndDate = '';
         
         // ========== COLOR DATABASE ==========
-        // Main trending colors (20 attractive colors)
         const mainColorsList = [
-            { name: "Red", code: "#FF0000" },
-            { name: "Crimson", code: "#DC143C" },
-            { name: "Maroon", code: "#800000" },
-            { name: "Orange", code: "#FFA500" },
-            { name: "Gold", code: "#FFD700" },
-            { name: "Yellow", code: "#FFFF00" },
-            { name: "Lime", code: "#32CD32" },
-            { name: "Green", code: "#008000" },
-            { name: "Teal", code: "#008080" },
-            { name: "Cyan", code: "#00FFFF" },
-            { name: "Blue", code: "#0000FF" },
-            { name: "Navy", code: "#000080" },
-            { name: "Purple", code: "#800080" },
-            { name: "Magenta", code: "#FF00FF" },
-            { name: "Pink", code: "#FF69B4" },
-            { name: "HotPink", code: "#FF1493" },
-            { name: "Brown", code: "#8B4513" },
-            { name: "Black", code: "#000000" },
-            { name: "White", code: "#FFFFFF" },
-            { name: "Silver", code: "#C0C0C0" }
+            { name: "Red", code: "#FF0000" }, { name: "Crimson", code: "#DC143C" }, { name: "Maroon", code: "#800000" },
+            { name: "Orange", code: "#FFA500" }, { name: "Gold", code: "#FFD700" }, { name: "Yellow", code: "#FFFF00" },
+            { name: "Lime", code: "#32CD32" }, { name: "Green", code: "#008000" }, { name: "Teal", code: "#008080" },
+            { name: "Cyan", code: "#00FFFF" }, { name: "Blue", code: "#0000FF" }, { name: "Navy", code: "#000080" },
+            { name: "Purple", code: "#800080" }, { name: "Magenta", code: "#FF00FF" }, { name: "Pink", code: "#FF69B4" },
+            { name: "HotPink", code: "#FF1493" }, { name: "Brown", code: "#8B4513" }, { name: "Black", code: "#000000" },
+            { name: "White", code: "#FFFFFF" }, { name: "Silver", code: "#C0C0C0" }
         ];
         
-        // Generate 200+ colors
         function getAllColorsList() {
             let colors = [...mainColorsList];
-            
-            // Add shades
-            const shadeBases = [
-                "Red", "Blue", "Green", "Purple", "Orange", "Pink", "Teal", "Brown"
-            ];
-            
-            shadeBases.forEach(baseName => {
-                const baseColor = mainColorsList.find(c => c.name === baseName);
-                if (baseColor) {
-                    for (let i = 1; i <= 8; i++) {
-                        const factor = Math.floor(0x33 * i);
-                        let newCode = baseColor.code;
-                        if (newCode === "#FF0000") newCode = `#FF${factor.toString(16).padStart(2,'0')}${factor.toString(16).padStart(2,'0')}`;
-                        else if (newCode === "#0000FF") newCode = `#${factor.toString(16).padStart(2,'0')}${factor.toString(16).padStart(2,'0')}FF`;
-                        else if (newCode === "#008000") newCode = `#00${factor.toString(16).padStart(2,'0')}00`;
-                        else if (newCode === "#800080") newCode = `#${(128+factor).toString(16)}00${(128+factor).toString(16)}`;
-                        else newCode = baseColor.code;
-                        colors.push({ name: `${baseName} Shade ${i}`, code: newCode });
-                    }
-                }
-            });
-            
-            // Extra color names
-            const extraColors = [
-                "Lavender", "Indigo", "Violet", "Turquoise", "Aqua", "Coral", "Salmon", "Khaki",
-                "Ivory", "LemonChiffon", "MintCream", "Olive", "PeachPuff", "Plum", "Rose", "Tan", "Wheat",
-                "Beige", "Bisque", "BlanchedAlmond", "BlueViolet", "BurlyWood", "CadetBlue", "Chartreuse",
-                "Chocolate", "Coral", "CornflowerBlue", "Cornsilk", "DarkCyan", "DarkGoldenRod", "DarkGray",
-                "DarkGreen", "DarkKhaki", "DarkMagenta", "DarkOliveGreen", "DarkOrange", "DarkOrchid",
-                "DarkRed", "DarkSalmon", "DarkSeaGreen", "DarkSlateBlue", "DarkSlateGray", "DarkTurquoise",
-                "DarkViolet", "DeepPink", "DeepSkyBlue", "DimGray", "DodgerBlue", "FireBrick", "FloralWhite",
-                "ForestGreen", "Fuchsia", "Gainsboro", "GhostWhite", "GoldenRod", "Gray", "GreenYellow",
-                "HoneyDew", "HotPink", "IndianRed", "LawnGreen", "LightBlue", "LightCoral", "LightCyan",
+            const extraColors = ["Lavender", "Indigo", "Violet", "Turquoise", "Aqua", "Coral", "Salmon", "Khaki",
+                "Ivory", "MintCream", "Olive", "PeachPuff", "Plum", "Rose", "Tan", "Wheat", "Beige", "Bisque",
+                "Chocolate", "CornflowerBlue", "DarkCyan", "DarkGoldenRod", "DarkGray", "DarkGreen", "DarkKhaki",
+                "DarkMagenta", "DarkOliveGreen", "DarkOrange", "DarkOrchid", "DarkRed", "DarkSalmon", "DarkSeaGreen",
+                "DarkSlateBlue", "DarkSlateGray", "DarkTurquoise", "DarkViolet", "DeepPink", "DeepSkyBlue", "DimGray",
+                "DodgerBlue", "FireBrick", "ForestGreen", "Fuchsia", "Gainsboro", "GhostWhite", "GoldenRod", "Gray",
+                "GreenYellow", "HoneyDew", "IndianRed", "LawnGreen", "LightBlue", "LightCoral", "LightCyan",
                 "LightGoldenRodYellow", "LightGray", "LightGreen", "LightPink", "LightSalmon", "LightSeaGreen",
                 "LightSkyBlue", "LightSlateGray", "LightSteelBlue", "LightYellow", "LimeGreen", "Linen",
-                "MediumAquaMarine", "MediumBlue", "MediumOrchid", "MediumPurple", "MediumSeaGreen",
-                "MediumSlateBlue", "MediumSpringGreen", "MediumTurquoise", "MediumVioletRed", "MidnightBlue",
-                "MintCream", "MistyRose", "Moccasin", "NavajoWhite", "OldLace", "OliveDrab", "OrangeRed",
-                "Orchid", "PaleGoldenRod", "PaleGreen", "PaleTurquoise", "PaleVioletRed", "PapayaWhip",
-                "PeachPuff", "Peru", "Pink", "Plum", "PowderBlue", "RosyBrown", "RoyalBlue", "SaddleBrown",
-                "SandyBrown", "SeaGreen", "SeaShell", "Sienna", "SkyBlue", "SlateBlue", "SlateGray",
-                "Snow", "SpringGreen", "SteelBlue", "Tan", "Thistle", "Tomato", "Turquoise", "Violet",
-                "Wheat", "WhiteSmoke", "YellowGreen"
-            ];
+                "MediumAquaMarine", "MediumBlue", "MediumOrchid", "MediumPurple", "MediumSeaGreen", "MediumSlateBlue",
+                "MediumSpringGreen", "MediumTurquoise", "MediumVioletRed", "MidnightBlue", "MistyRose", "Moccasin",
+                "NavajoWhite", "OldLace", "OliveDrab", "OrangeRed", "Orchid", "PaleGoldenRod", "PaleGreen",
+                "PaleTurquoise", "PaleVioletRed", "PapayaWhip", "Peru", "PowderBlue", "RosyBrown", "RoyalBlue",
+                "SaddleBrown", "SandyBrown", "SeaGreen", "SeaShell", "Sienna", "SkyBlue", "SlateBlue", "SlateGray",
+                "Snow", "SpringGreen", "SteelBlue", "Thistle", "Tomato", "Violet", "WhiteSmoke", "YellowGreen"];
             
             extraColors.forEach(colorName => {
                 let randomCode = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6,'0')}`;
                 colors.push({ name: colorName, code: randomCode });
             });
-            
             return colors;
         }
         
@@ -665,6 +808,76 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
         
+        // ========== DATE FUNCTIONS (from first code) ==========
+        function parseOrderDate(orderDateStr) {
+            if (!orderDateStr) return null;
+            try {
+                return new Date(orderDateStr);
+            } catch(e) { return null; }
+        }
+        
+        function isToday(orderDate) {
+            if (!orderDate) return false;
+            const today = new Date();
+            return orderDate.toDateString() === today.toDateString();
+        }
+        
+        function isThisWeek(orderDate) {
+            if (!orderDate) return false;
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            startOfWeek.setHours(0,0,0,0);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            endOfWeek.setHours(23,59,59,999);
+            return orderDate >= startOfWeek && orderDate <= endOfWeek;
+        }
+        
+        function isThisMonth(orderDate) {
+            if (!orderDate) return false;
+            const today = new Date();
+            return orderDate.getMonth() === today.getMonth() && orderDate.getFullYear() === today.getFullYear();
+        }
+        
+        function isWithinCustomRange(orderDate) {
+            if (!customStartDate || !orderDate) return true;
+            const startParts = customStartDate.split('/');
+            const startDate = new Date(parseInt(startParts[2]), parseInt(startParts[1]) - 1, parseInt(startParts[0]));
+            startDate.setHours(0,0,0,0);
+            
+            if (customEndDate) {
+                const endParts = customEndDate.split('/');
+                const endDate = new Date(parseInt(endParts[2]), parseInt(endParts[1]) - 1, parseInt(endParts[0]));
+                endDate.setHours(23,59,59,999);
+                return orderDate >= startDate && orderDate <= endDate;
+            }
+            return orderDate.toDateString() === startDate.toDateString();
+        }
+        
+        function filterOrders() {
+            let filtered = [...orders];
+            
+            if (currentStatusFilter !== 'all') {
+                filtered = filtered.filter(o => o.status === currentStatusFilter);
+            }
+            
+            filtered = filtered.filter(o => {
+                const orderDate = parseOrderDate(o.orderDate);
+                if (!orderDate) return currentDateFilter === 'all';
+                
+                if (currentDateFilter === 'today') return isToday(orderDate);
+                if (currentDateFilter === 'week') return isThisWeek(orderDate);
+                if (currentDateFilter === 'month') return isThisMonth(orderDate);
+                if (currentDateFilter === 'custom') return isWithinCustomRange(orderDate);
+                return true;
+            });
+            
+            filtered.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+            return filtered;
+        }
+        
+        // ========== LOAD DATA ==========
         async function loadData() {
             try {
                 const productsSnap = await db.collection('products').orderBy('createdAt', 'desc').get();
@@ -739,6 +952,7 @@
             }
         }
         
+        // ========== PRODUCTS ==========
         function renderProducts() {
             const container = document.getElementById('productsList');
             if (!container) return;
@@ -786,7 +1000,7 @@
             });
         }
         
-        // ========== EDIT MODAL WITH IMPROVED COLOR SELECTION ==========
+        // ========== EDIT MODAL ==========
         function openEditModal(productId) {
             currentEditProduct = products.find(p => p.id == productId);
             if (!currentEditProduct) return;
@@ -804,39 +1018,22 @@
             const modal = document.getElementById('editModal');
             if (!modal) return;
             
-            // Sizes HTML
             const sizesHtml = (currentEditProduct.sizes || []).map((size, idx) => `
-                <span class="chip">
-                    ${escapeHtml(size)} 
-                    <span class="remove-chip" onclick="removeSize(${idx})">✕</span>
-                </span>
+                <span class="chip">${escapeHtml(size)} <span class="remove-chip" onclick="removeSize(${idx})">✕</span></span>
             `).join('');
             
-            // Colors HTML with actual color dots
             const colorsHtml = (currentEditProduct.colors || []).map((color, idx) => {
                 const colorName = typeof color === 'object' ? color.name : color;
                 const colorCode = typeof color === 'object' ? color.code : '#D4AF37';
-                return `<span class="chip">
-                    <span class="color-dot-small" style="background: ${colorCode};"></span> 
-                    ${escapeHtml(colorName)} 
-                    <span class="remove-chip" onclick="removeColor(${idx})">✕</span>
-                </span>`;
+                return `<span class="chip"><span class="color-dot-small" style="background: ${colorCode};"></span> ${escapeHtml(colorName)} <span class="remove-chip" onclick="removeColor(${idx})">✕</span></span>`;
             }).join('');
             
-            // Images HTML
             const imagesHtml = (currentEditProduct.images || []).map((img, idx) => `
-                <div class="edit-preview-img">
-                    <img src="${img}" alt="Product image">
-                    <div class="remove-image-btn" onclick="removeImage(${idx})">✕</div>
-                </div>
+                <div class="edit-preview-img"><img src="${img}"><div class="remove-image-btn" onclick="removeImage(${idx})">✕</div></div>
             `).join('');
             
-            // Combos HTML
             const combosHtml = (currentEditProduct.combos || []).map((combo, idx) => `
-                <span class="chip">
-                    ${combo.quantity} for ₹${combo.price}
-                    <span class="remove-chip" onclick="removeCombo(${idx})">✕</span>
-                </span>
+                <span class="chip">${combo.quantity} for ₹${combo.price} <span class="remove-chip" onclick="removeCombo(${idx})">✕</span></span>
             `).join('');
             
             modal.innerHTML = `
@@ -845,174 +1042,86 @@
                         <h2><i class="fas fa-edit"></i> Edit Product: ${escapeHtml(currentEditProduct.name)}</h2>
                         <button class="close-edit-modal" onclick="closeEditModal()">&times;</button>
                     </div>
-                    
-                    <!-- Basic Info -->
-                    <div class="form-group">
-                        <label>Product Name</label>
-                        <input type="text" id="editProductName" value="${escapeHtml(currentEditProduct.name)}">
-                    </div>
-                    
+                    <div class="form-group"><label>Product Name</label><input type="text" id="editProductName" value="${escapeHtml(currentEditProduct.name)}"></div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Category</label>
-                            <select id="editCategory">
-                                <option value="T-Shirt" ${currentEditProduct.category === 'T-Shirt' ? 'selected' : ''}>👕 T-Shirt</option>
-                                <option value="Shirt" ${currentEditProduct.category === 'Shirt' ? 'selected' : ''}>👔 Shirt</option>
-                                <option value="Kurta" ${currentEditProduct.category === 'Kurta' ? 'selected' : ''}>🧥 Kurta</option>
-                                <option value="Saree" ${currentEditProduct.category === 'Saree' ? 'selected' : ''}>🥻 Saree</option>
-                                <option value="Jeans" ${currentEditProduct.category === 'Jeans' ? 'selected' : ''}>👖 Jeans</option>
-                                <option value="Crystal" ${currentEditProduct.category === 'Crystal' ? 'selected' : ''}>💎 Crystal</option>
-                                <option value="Mala" ${currentEditProduct.category === 'Mala' ? 'selected' : ''}>📿 Mala</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Offer Badge</label>
-                            <select id="editBadge">
-                                <option value="Best Seller" ${currentEditProduct.badge === 'Best Seller' ? 'selected' : ''}>🔥 Best Seller</option>
-                                <option value="Trending" ${currentEditProduct.badge === 'Trending' ? 'selected' : ''}>⭐ Trending</option>
-                                <option value="New" ${currentEditProduct.badge === 'New' ? 'selected' : ''}>✨ New Arrival</option>
-                                <option value="Sale" ${currentEditProduct.badge === 'Sale' ? 'selected' : ''}>🎉 Sale</option>
-                                <option value="Limited" ${currentEditProduct.badge === 'Limited' ? 'selected' : ''}>💎 Limited</option>
-                            </select>
-                        </div>
+                        <div class="form-group"><label>Category</label><select id="editCategory">
+                            <option value="T-Shirt" ${currentEditProduct.category === 'T-Shirt' ? 'selected' : ''}>👕 T-Shirt</option>
+                            <option value="Shirt" ${currentEditProduct.category === 'Shirt' ? 'selected' : ''}>👔 Shirt</option>
+                            <option value="Kurta" ${currentEditProduct.category === 'Kurta' ? 'selected' : ''}>🧥 Kurta</option>
+                            <option value="Saree" ${currentEditProduct.category === 'Saree' ? 'selected' : ''}>🥻 Saree</option>
+                            <option value="Jeans" ${currentEditProduct.category === 'Jeans' ? 'selected' : ''}>👖 Jeans</option>
+                            <option value="Crystal" ${currentEditProduct.category === 'Crystal' ? 'selected' : ''}>💎 Crystal</option>
+                            <option value="Mala" ${currentEditProduct.category === 'Mala' ? 'selected' : ''}>📿 Mala</option>
+                        </select></div>
+                        <div class="form-group"><label>Offer Badge</label><select id="editBadge">
+                            <option value="Best Seller" ${currentEditProduct.badge === 'Best Seller' ? 'selected' : ''}>🔥 Best Seller</option>
+                            <option value="Trending" ${currentEditProduct.badge === 'Trending' ? 'selected' : ''}>⭐ Trending</option>
+                            <option value="New" ${currentEditProduct.badge === 'New' ? 'selected' : ''}>✨ New Arrival</option>
+                            <option value="Sale" ${currentEditProduct.badge === 'Sale' ? 'selected' : ''}>🎉 Sale</option>
+                            <option value="Limited" ${currentEditProduct.badge === 'Limited' ? 'selected' : ''}>💎 Limited</option>
+                        </select></div>
                     </div>
-                    
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Price (₹)</label>
-                            <input type="number" id="editPrice" value="${currentEditProduct.price}">
-                        </div>
-                        <div class="form-group">
-                            <label>Compare Price (MRP)</label>
-                            <input type="number" id="editComparePrice" value="${currentEditProduct.comparePrice || currentEditProduct.originalPrice || ''}">
-                        </div>
+                        <div class="form-group"><label>Price (₹)</label><input type="number" id="editPrice" value="${currentEditProduct.price}"></div>
+                        <div class="form-group"><label>Compare Price (MRP)</label><input type="number" id="editComparePrice" value="${currentEditProduct.comparePrice || ''}"></div>
                     </div>
                     
-                    <!-- SIZES -->
-                    <div class="form-group">
-                        <label><i class="fas fa-tshirt"></i> Sizes Available</label>
-                        <div class="chips-container" id="editSizesContainer">${sizesHtml || '<span style="color:#888; font-size:12px;">No sizes added</span>'}</div>
-                        <div class="add-section">
-                            <input type="text" id="newSizeInput" placeholder="Enter size (e.g., XL, M, L)">
-                            <button class="add-btn" onclick="addSize()"><i class="fas fa-plus"></i> Add Size</button>
-                        </div>
+                    <div class="form-group"><label><i class="fas fa-tshirt"></i> Sizes Available</label>
+                        <div class="chips-container">${sizesHtml || '<span style="color:#888;">No sizes added</span>'}</div>
+                        <div class="add-section"><input type="text" id="newSizeInput" placeholder="Enter size"><button class="add-btn" onclick="addSize()">+ Add Size</button></div>
                     </div>
                     
-                    <!-- ========== IMPROVED COLORS SECTION ========== -->
-                    <div class="form-group">
-                        <label><i class="fas fa-palette"></i> Colors Available</label>
-                        <div class="chips-container" id="editColorsContainer">${colorsHtml || '<span style="color:#888; font-size:12px;">No colors added</span>'}</div>
-                        
-                        <!-- Main / Trending Colors -->
-                        <div style="margin: 15px 0 10px 0; font-size:13px; color:#D4AF37;">✨ Trending Colors (Click to add)</div>
+                    <div class="form-group"><label><i class="fas fa-palette"></i> Colors Available</label>
+                        <div class="chips-container">${colorsHtml || '<span style="color:#888;">No colors added</span>'}</div>
                         <div class="main-colors-container" id="mainColorList"></div>
-                        
-                        <!-- See All Button -->
-                        <div style="text-align: center; margin: 10px 0;">
-                            <button type="button" class="add-btn" id="seeAllColorsBtn" style="background: rgba(212,175,55,0.2);"><i class="fas fa-eye"></i> See All Colors (200+)</button>
-                        </div>
-                        
-                        <!-- Full Color Grid Popup (Hidden by default) -->
-                        <div id="fullColorGridPopup" style="display: none;" class="color-grid-popup">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <span style="color:#D4AF37; font-weight: bold;">🎨 All Colors (Click to add)</span>
-                                <button type="button" id="closeColorGridBtn" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
-                            </div>
+                        <div style="text-align:center; margin:10px 0;"><button type="button" class="add-btn" id="seeAllColorsBtn" style="background:rgba(212,175,55,0.2);"><i class="fas fa-eye"></i> See All Colors (200+)</button></div>
+                        <div id="fullColorGridPopup" style="display:none;" class="color-grid-popup">
+                            <div style="display:flex; justify-content:space-between;"><span style="color:#D4AF37;">🎨 All Colors</span><button type="button" id="closeColorGridBtn" style="background:none; border:none; color:white; font-size:24px;">&times;</button></div>
                             <div id="fullColorGrid" class="color-grid"></div>
                         </div>
-                        
-                        <!-- Manual Add Option -->
-                        <div class="add-section" style="margin-top: 15px;">
-                            <input type="text" id="newColorName" placeholder="Or enter custom color name">
-                            <input type="color" id="newColorCode" value="#D4AF37" style="width: 60px; height: 38px; cursor: pointer;">
-                            <button class="add-btn" onclick="addColor()"><i class="fas fa-plus"></i> Add Custom</button>
-                        </div>
-                        <div style="font-size: 11px; color: #888; margin-top: 5px;">💡 Tip: Click on any color circle above to add instantly</div>
+                        <div class="add-section"><input type="text" id="newColorName" placeholder="Custom color name"><input type="color" id="newColorCode" value="#D4AF37" style="width:60px;"><button class="add-btn" onclick="addColor()">+ Add Custom</button></div>
                     </div>
                     
-                    <!-- IMAGES -->
-                    <div class="form-group">
-                        <label><i class="fas fa-images"></i> Product Images</label>
-                        <div class="image-preview-edit" id="editImagesContainer">${imagesHtml || '<span style="color:#888; font-size:12px;">No images added</span>'}</div>
-                        <div class="add-section">
-                            <input type="file" id="newImagesInput" multiple accept="image/*">
-                            <button class="add-btn" onclick="addImages()"><i class="fas fa-upload"></i> Upload Images</button>
-                        </div>
+                    <div class="form-group"><label><i class="fas fa-images"></i> Product Images</label>
+                        <div class="image-preview-edit">${imagesHtml || '<span style="color:#888;">No images</span>'}</div>
+                        <div class="add-section"><input type="file" id="newImagesInput" multiple accept="image/*"><button class="add-btn" onclick="addImages()">Upload Images</button></div>
                     </div>
                     
-                    <!-- COMBO OFFERS -->
-                    <div class="form-group">
-                        <label><i class="fas fa-gift"></i> Combo Offers (e.g., 2 for ₹900)</label>
-                        <div class="chips-container" id="editCombosContainer">${combosHtml || '<span style="color:#888; font-size:12px;">No combo offers added</span>'}</div>
-                        <div class="add-section">
-                            <input type="number" id="newComboQty" placeholder="Quantity (e.g., 2)" style="width: 120px;">
-                            <input type="number" id="newComboPrice" placeholder="Price (e.g., 900)" style="width: 130px;">
-                            <button class="add-btn" onclick="addCombo()"><i class="fas fa-plus"></i> Add Combo</button>
-                        </div>
+                    <div class="form-group"><label><i class="fas fa-gift"></i> Combo Offers</label>
+                        <div class="chips-container">${combosHtml || '<span style="color:#888;">No combos</span>'}</div>
+                        <div class="add-section"><input type="number" id="newComboQty" placeholder="Qty"><input type="number" id="newComboPrice" placeholder="Price"><button class="add-btn" onclick="addCombo()">+ Add Combo</button></div>
                     </div>
                     
-                    <!-- Description -->
-                    <div class="form-group">
-                        <label>Full Description</label>
-                        <textarea id="editFullDesc" rows="3">${escapeHtml(currentEditProduct.fullDesc || '')}</textarea>
-                    </div>
-                    
+                    <div class="form-group"><label>Full Description</label><textarea id="editFullDesc" rows="3">${escapeHtml(currentEditProduct.fullDesc || '')}</textarea></div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Stock Quantity</label>
-                            <input type="number" id="editStock" value="${currentEditProduct.stock || 10}">
-                        </div>
-                        <div class="form-group">
-                            <label>Status</label>
-                            <select id="editStatus">
-                                <option value="active" ${currentEditProduct.status === 'active' ? 'selected' : ''}>✅ Active (Visible on website)</option>
-                                <option value="inactive" ${currentEditProduct.status === 'inactive' ? 'selected' : ''}>❌ Inactive (Hidden)</option>
-                            </select>
-                        </div>
+                        <div class="form-group"><label>Stock Quantity</label><input type="number" id="editStock" value="${currentEditProduct.stock || 10}"></div>
+                        <div class="form-group"><label>Status</label><select id="editStatus"><option value="active" ${currentEditProduct.status === 'active' ? 'selected' : ''}>✅ Active</option><option value="inactive" ${currentEditProduct.status === 'inactive' ? 'selected' : ''}>❌ Inactive</option></select></div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Video URL (YouTube)</label>
-                        <input type="url" id="editVideoUrl" value="${currentEditProduct.videoUrl || ''}" placeholder="https://youtube.com/watch?v=...">
-                    </div>
-                    
-                    <button class="save-edit-btn" onclick="saveProductEdit()"><i class="fas fa-save"></i> Save Changes to Cloud</button>
+                    <div class="form-group"><label>Video URL</label><input type="url" id="editVideoUrl" value="${currentEditProduct.videoUrl || ''}"></div>
+                    <button class="save-edit-btn" onclick="saveProductEdit()"><i class="fas fa-save"></i> Save Changes</button>
                 </div>
             `;
             
-            // Render main colors after modal is in DOM
             renderMainColorButtons();
         }
         
-        // Render main trending colors
         function renderMainColorButtons() {
             const container = document.getElementById('mainColorList');
             if (!container) return;
-            
             container.innerHTML = mainColorsList.map(color => `
                 <div class="main-color-item" onclick="addColorFromMain('${escapeHtml(color.name)}', '${color.code}')">
-                    <div class="main-color-circle" style="background: ${color.code}; border: 2px solid ${color.code === '#FFFFFF' ? '#ccc' : '#D4AF37'};"></div>
+                    <div class="main-color-circle" style="background: ${color.code};"></div>
                     <span class="main-color-name">${escapeHtml(color.name)}</span>
                 </div>
             `).join('');
             
-            // Attach See All button event
-            const seeAllBtn = document.getElementById('seeAllColorsBtn');
-            if (seeAllBtn) {
-                seeAllBtn.onclick = () => toggleFullColorGrid(true);
-            }
-            
-            const closeBtn = document.getElementById('closeColorGridBtn');
-            if (closeBtn) {
-                closeBtn.onclick = () => toggleFullColorGrid(false);
-            }
+            document.getElementById('seeAllColorsBtn')?.addEventListener('click', () => toggleFullColorGrid(true));
+            document.getElementById('closeColorGridBtn')?.addEventListener('click', () => toggleFullColorGrid(false));
         }
         
-        // Toggle full color grid (200+ colors)
         function toggleFullColorGrid(show) {
             const gridPopup = document.getElementById('fullColorGridPopup');
             if (!gridPopup) return;
-            
             if (show) {
                 const allColors = getAllColorsList();
                 const gridContainer = document.getElementById('fullColorGrid');
@@ -1020,7 +1129,7 @@
                     gridContainer.innerHTML = allColors.map(color => `
                         <div class="color-option" onclick="addColorFromFullGrid('${escapeHtml(color.name)}', '${color.code}')">
                             <div class="color-circle" style="background: ${color.code};"></div>
-                            <span class="color-name">${escapeHtml(color.name).substring(0, 12)}</span>
+                            <span class="color-name">${escapeHtml(color.name).substring(0,12)}</span>
                         </div>
                     `).join('');
                 }
@@ -1030,29 +1139,19 @@
             }
         }
         
-        // Add color from main list
         function addColorFromMain(name, code) {
-            const exists = currentEditProduct.colors.some(c => {
-                if (typeof c === 'object') return c.name === name;
-                return c === name;
-            });
+            const exists = currentEditProduct.colors.some(c => (typeof c === 'object' ? c.name : c) === name);
             if (!exists) {
                 currentEditProduct.colors.push({ name: name, code: code });
                 renderEditModal();
-                showToast(`✅ ${name} added successfully!`);
+                showToast(`✅ ${name} added!`);
             } else {
-                showToast(`⚠️ ${name} is already added`, true);
+                showToast(`⚠️ ${name} already exists`, true);
             }
         }
         
-        // Add color from full grid
-        function addColorFromFullGrid(name, code) {
-            addColorFromMain(name, code);
-            // Optional: auto close grid after adding
-            // toggleFullColorGrid(false);
-        }
+        function addColorFromFullGrid(name, code) { addColorFromMain(name, code); }
         
-        // Size functions
         function addSize() {
             const input = document.getElementById('newSizeInput');
             const size = input.value.trim().toUpperCase();
@@ -1060,47 +1159,27 @@
                 currentEditProduct.sizes.push(size);
                 renderEditModal();
                 input.value = '';
-            } else if (size && currentEditProduct.sizes.includes(size)) {
-                showToast('⚠️ Size already exists', true);
             }
         }
         
-        function removeSize(index) {
-            currentEditProduct.sizes.splice(index, 1);
-            renderEditModal();
-        }
+        function removeSize(index) { currentEditProduct.sizes.splice(index,1); renderEditModal(); }
         
-        // Custom color add
         function addColor() {
             const name = document.getElementById('newColorName').value.trim();
             const code = document.getElementById('newColorCode').value;
             if (name) {
-                const exists = currentEditProduct.colors.some(c => {
-                    if (typeof c === 'object') return c.name === name;
-                    return c === name;
-                });
+                const exists = currentEditProduct.colors.some(c => (typeof c === 'object' ? c.name : c) === name);
                 if (!exists) {
                     currentEditProduct.colors.push({ name: name, code: code });
                     renderEditModal();
                     document.getElementById('newColorName').value = '';
-                    showToast(`✅ Custom color "${name}" added!`);
-                } else {
-                    showToast('⚠️ Color already exists', true);
-                }
-            } else {
-                showToast('❌ Please enter a color name', true);
+                    showToast(`✅ ${name} added!`);
+                } else { showToast('⚠️ Color exists', true); }
             }
         }
         
-        function removeColor(index) {
-            const removed = currentEditProduct.colors[index];
-            const colorName = typeof removed === 'object' ? removed.name : removed;
-            currentEditProduct.colors.splice(index, 1);
-            renderEditModal();
-            showToast(`🗑️ Color "${colorName}" removed`);
-        }
+        function removeColor(index) { currentEditProduct.colors.splice(index,1); renderEditModal(); }
         
-        // Combo functions
         function addCombo() {
             const qty = parseInt(document.getElementById('newComboQty').value);
             const price = parseInt(document.getElementById('newComboPrice').value);
@@ -1109,38 +1188,25 @@
                 renderEditModal();
                 document.getElementById('newComboQty').value = '';
                 document.getElementById('newComboPrice').value = '';
-                showToast(`✅ Combo offer added: ${qty} for ₹${price}`);
-            } else {
-                showToast('❌ Please enter both quantity and price', true);
+                showToast(`✅ Combo added: ${qty} for ₹${price}`);
             }
         }
         
-        function removeCombo(index) {
-            currentEditProduct.combos.splice(index, 1);
-            renderEditModal();
-        }
+        function removeCombo(index) { currentEditProduct.combos.splice(index,1); renderEditModal(); }
         
-        // Image functions
         async function addImages() {
             const files = document.getElementById('newImagesInput').files;
             if (!files.length) return;
-            
-            showToast('⏳ Compressing images...');
+            showToast('⏳ Compressing...');
             const newImages = [];
-            for (const file of files) {
-                const compressed = await compressImage(file);
-                newImages.push(compressed);
-            }
+            for (const file of files) newImages.push(await compressImage(file));
             currentEditProduct.images.push(...newImages);
             renderEditModal();
             document.getElementById('newImagesInput').value = '';
             showToast(`✅ ${newImages.length} image(s) added`);
         }
         
-        function removeImage(index) {
-            currentEditProduct.images.splice(index, 1);
-            renderEditModal();
-        }
+        function removeImage(index) { currentEditProduct.images.splice(index,1); renderEditModal(); }
         
         async function saveProductEdit() {
             const updatedData = {
@@ -1159,42 +1225,36 @@
                 videoUrl: document.getElementById('editVideoUrl').value,
                 updatedAt: new Date().toISOString()
             };
-            
             const result = await updateProductInFirebase(currentEditProduct.id, updatedData);
             if (result.success) {
-                showToast('✅ Product updated successfully!');
+                showToast('✅ Product updated!');
                 closeEditModal();
                 await loadData();
-            } else {
-                showToast('❌ Failed to update product: ' + result.error, true);
-            }
+            } else { showToast('❌ Update failed', true); }
         }
         
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('show');
-            currentEditProduct = null;
-        }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('show'); currentEditProduct = null; }
         
         async function deleteProduct(id) {
-            if (confirm('⚠️ Are you sure you want to DELETE this product permanently from cloud? This action cannot be undone!')) {
+            if (confirm('⚠️ Delete permanently?')) {
                 const result = await deleteProductFromFirebase(id);
-                if (result.success) {
-                    showToast('✅ Product deleted permanently!');
-                    await loadData();
-                } else {
-                    showToast('❌ Delete failed', true);
-                }
+                if (result.success) { showToast('✅ Deleted'); await loadData(); }
+                else { showToast('❌ Delete failed', true); }
             }
         }
         
+        // ========== ORDERS (with first code's beautiful modal) ==========
         function renderOrders() {
             const container = document.getElementById('ordersList');
             if (!container) return;
-            if (orders.length === 0) {
-                container.innerHTML = '<tr><td colspan="7" style="text-align:center;">No orders found</td></tr>';
+            
+            const filteredOrders = filterOrders();
+            if (filteredOrders.length === 0) {
+                container.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">📭 No orders found</td></tr>';
                 return;
             }
-            container.innerHTML = orders.map(order => {
+            
+            container.innerHTML = filteredOrders.map(order => {
                 const statusBadgeClass = (() => {
                     switch(order.status) {
                         case 'confirmed': return 'status-confirmed';
@@ -1208,68 +1268,195 @@
                 return `
                     <tr>
                         <td>${order.orderId || order.id}</td>
-                        <td>${new Date(order.orderDate || order.date).toLocaleDateString('en-IN')}</td>
+                        <td>${new Date(order.orderDate).toLocaleDateString('en-IN')}</td>
                         <td>${order.customerName || 'Guest'}</td>
                         <td>₹${(order.total || 0).toLocaleString('en-IN')}</td>
                         <td><span class="status-badge ${statusBadgeClass}">${order.status || 'Confirmed'}</span></td>
-                        <td>
-                            <select class="status-select" onchange="updateOrderStatus('${order.id}', this.value)">
-                                <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-                                <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
-                                <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
-                                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
-                                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button class="view-details" onclick="viewOrderDetails('${order.id}')">View</button>
-                            <button class="delete-order-btn" onclick="deleteOrder('${order.id}')">Delete</button>
-                        </td>
+                        <td><select class="status-select" onchange="updateOrderStatus('${order.id}', this.value)">
+                            <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                            <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
+                            <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                            <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select></td>
+                        <td><button class="view-details" onclick="viewOrderDetails('${order.id}')"><i class="fas fa-eye"></i> View</button>
+                        <button class="delete-order-btn" onclick="deleteOrder('${order.id}')"><i class="fas fa-trash"></i> Delete</button></td>
                     </tr>
                 `;
             }).join('');
+            updateStats();
         }
+        
+        function viewOrderDetails(orderId) {
+            const order = orders.find(o => o.id == orderId);
+            if (!order) return;
+            
+            const itemsHtml = (order.items || []).map(item => {
+                const product = products.find(p => p.id == item.id);
+                const hasImage = product && product.images && product.images.length > 0;
+                const imageUrl = hasImage ? product.images[0] : null;
+                const itemIcon = product ? (product.icon || 'fa-gem') : 'fa-gem';
+                const itemSize = item.size || 'Not Selected';
+                const itemColor = item.color || '';
+                
+                return `
+                    <div class="order-item-with-img">
+                        <div class="order-product-img">
+                            ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(item.name)}">` : `<i class="fas ${itemIcon}"></i>`}
+                        </div>
+                        <div class="order-item-info">
+                            <h4>${escapeHtml(item.name)}</h4>
+                            ${itemSize !== 'Not Selected' ? `<div class="order-item-size"><i class="fas fa-tshirt"></i> Size: ${escapeHtml(itemSize)}</div>` : ''}
+                            ${itemColor ? `<div class="order-item-size"><i class="fas fa-palette"></i> Color: ${escapeHtml(itemColor)}</div>` : ''}
+                            <p>Quantity: ${item.quantity} × ₹${(item.price || 0).toLocaleString('en-IN')}</p>
+                        </div>
+                        <div class="order-item-price">₹${((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN')}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            const statusBadgeClass = (() => {
+                switch(order.status) {
+                    case 'confirmed': return 'status-confirmed';
+                    case 'processing': return 'status-processing';
+                    case 'shipped': return 'status-shipped';
+                    case 'delivered': return 'status-delivered';
+                    case 'cancelled': return 'status-cancelled';
+                    default: return 'status-confirmed';
+                }
+            })();
+            
+            document.getElementById('orderDetailContent').innerHTML = `
+                <div class="order-detail-row"><strong>📋 Order ID:</strong> ${order.orderId || order.id}</div>
+                <div class="order-detail-row"><strong>📅 Date:</strong> ${new Date(order.orderDate).toLocaleString()}</div>
+                <div class="order-detail-row"><strong>📊 Status:</strong> <span class="status-badge ${statusBadgeClass}">${order.status || 'Confirmed'}</span></div>
+                <div class="order-detail-row"><strong>💳 Payment:</strong> ${order.paymentMethod || 'Cash on Delivery'}</div>
+                <div style="margin: 15px 0; border-top: 1px solid rgba(255,255,255,0.1);"></div>
+                <strong>👤 Customer Details:</strong>
+                <div class="order-detail-row"><strong>Name:</strong> ${order.customerName || 'Guest'}</div>
+                <div class="order-detail-row"><strong>📞 Phone:</strong> ${order.customerPhone || 'N/A'}</div>
+                <div class="order-detail-row"><strong>✉️ Email:</strong> ${order.customerEmail || 'N/A'}</div>
+                <div class="order-detail-row"><strong>📍 Address:</strong> ${order.shippingAddress?.address || 'N/A'}</div>
+                <div style="margin: 15px 0; border-top: 1px solid rgba(255,255,255,0.1);"></div>
+                <strong>🛍️ Order Items:</strong>
+                ${itemsHtml || '<div class="order-detail-row">No items</div>'}
+                <div style="margin-top: 15px; border-top: 1px solid rgba(212,175,55,0.3);"></div>
+                <div class="order-detail-row"><strong>💰 Total Amount:</strong> <span style="color:#D4AF37; font-size:18px;">₹${(order.total || 0).toLocaleString('en-IN')}</span></div>
+            `;
+            document.getElementById('orderModal').classList.add('show');
+        }
+        
+        function closeOrderModal() { document.getElementById('orderModal').classList.remove('show'); }
         
         async function updateOrderStatus(orderId, newStatus) {
             const result = await updateOrderStatusInFirebase(orderId, newStatus);
             if (result.success) {
                 showToast(`✅ Order status updated to ${newStatus}`);
                 await loadData();
-            } else {
-                showToast('❌ Update failed', true);
-            }
+            } else { showToast('❌ Update failed', true); }
         }
         
         async function deleteOrder(orderId) {
             if (confirm('⚠️ Delete this order permanently?')) {
                 const result = await deleteOrderFromFirebase(orderId);
-                if (result.success) {
-                    showToast('✅ Order deleted');
-                    await loadData();
-                } else {
-                    showToast('❌ Delete failed', true);
+                if (result.success) { showToast('✅ Order deleted'); await loadData(); }
+                else { showToast('❌ Delete failed', true); }
+            }
+        }
+        
+        // ========== FILTER FUNCTIONS ==========
+        function openDatePicker() { document.getElementById('datepickerModal').classList.add('show'); }
+        function closeDatePicker() { document.getElementById('datepickerModal').classList.remove('show'); }
+        
+        function updateDatePickerDisplay() {
+            const startDisplay = document.getElementById('startDateDisplay');
+            const endDisplay = document.getElementById('endDateDisplay');
+            if (startDisplay) {
+                if (tempStartDate) startDisplay.innerHTML = `<span class="selected-date">${tempStartDate}</span>`;
+                else startDisplay.innerHTML = `<span class="placeholder-text">dd/mm/yyyy</span>`;
+            }
+            if (endDisplay) {
+                if (tempEndDate) endDisplay.innerHTML = `<span class="selected-date">${tempEndDate}</span>`;
+                else endDisplay.innerHTML = `<span class="placeholder-text">dd/mm/yyyy (Optional)</span>`;
+            }
+        }
+        
+        function showNativeDatePicker(type) {
+            const input = document.createElement('input');
+            input.type = 'date';
+            input.style.position = 'absolute';
+            input.style.opacity = '0';
+            document.body.appendChild(input);
+            input.addEventListener('change', (e) => {
+                const value = e.target.value;
+                if (value) {
+                    const parts = value.split('-');
+                    const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    if (type === 'start') tempStartDate = formattedDate;
+                    else tempEndDate = formattedDate;
+                    updateDatePickerDisplay();
                 }
+                document.body.removeChild(input);
+            });
+            input.showPicker();
+        }
+        
+        function setStartDate() { showNativeDatePicker('start'); }
+        function setEndDate() { showNativeDatePicker('end'); }
+        
+        function applyDateRange() {
+            if (!tempStartDate) { showToast('❌ Please select start date', true); return; }
+            customStartDate = tempStartDate;
+            customEndDate = tempEndDate || '';
+            currentDateFilter = 'custom';
+            const dateRangeText = document.getElementById('dateRangeText');
+            if (dateRangeText) {
+                if (customEndDate) dateRangeText.innerText = `${customStartDate} to ${customEndDate}`;
+                else dateRangeText.innerText = `${customStartDate}`;
             }
+            document.querySelectorAll('.date-filter-btn').forEach(btn => btn.classList.remove('active'));
+            closeDatePicker();
+            renderOrders();
+            showToast(`📅 Showing orders from ${customStartDate}${customEndDate ? ' to ' + customEndDate : ''}`);
         }
         
-        function viewOrderDetails(orderId) {
-            const order = orders.find(o => o.id == orderId);
-            if (!order) return;
-            let itemsList = '';
-            if (order.items && order.items.length) {
-                itemsList = order.items.map(item => `  - ${item.name} x ${item.quantity} = ₹${(item.price * item.quantity).toLocaleString()}`).join('\n');
+        function clearDateRange() {
+            customStartDate = ''; customEndDate = ''; tempStartDate = ''; tempEndDate = '';
+            currentDateFilter = 'all';
+            const dateRangeText = document.getElementById('dateRangeText');
+            if (dateRangeText) dateRangeText.innerText = 'Select Date Range';
+            document.querySelectorAll('.date-filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-filter') === 'all') btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            renderOrders();
+            showToast('📅 Date filter cleared');
+        }
+        
+        function applyDateFilter(filter) {
+            currentDateFilter = filter;
+            if (filter !== 'custom') { customStartDate = ''; customEndDate = ''; 
+                const dateRangeText = document.getElementById('dateRangeText');
+                if (dateRangeText) dateRangeText.innerText = 'Select Date Range';
             }
-            alert(`📋 ORDER DETAILS\n\nOrder ID: ${order.orderId || order.id}\nCustomer: ${order.customerName}\nPhone: ${order.customerPhone}\nEmail: ${order.customerEmail}\nAddress: ${order.shippingAddress?.address || 'N/A'}\nTotal: ₹${order.total?.toLocaleString()}\nStatus: ${order.status}\nPayment: ${order.paymentMethod}\n\nItems:\n${itemsList || 'No items'}`);
+            document.querySelectorAll('.date-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-filter') === filter) btn.classList.add('active');
+            });
+            renderOrders();
         }
         
-        function goToAddProduct() {
-            window.location.href = 'admin-add-product.html';
+        function applyStatusFilter(filter) {
+            currentStatusFilter = filter;
+            document.querySelectorAll('.status-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-status') === filter) btn.classList.add('active');
+            });
+            renderOrders();
         }
         
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
-        }
+        function goToAddProduct() { window.location.href = 'admin-add-product.html'; }
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m)); }
         
         function renderDashboard() {
             document.getElementById('app').innerHTML = `
@@ -1288,24 +1475,52 @@
                     <button class="tab-btn" data-tab="orders">📋 Orders</button>
                 </div>
                 <div class="tab-content active" id="productsTab">
-                    <div class="add-product-header">
-                        <h3><i class="fas fa-boxes"></i> All Products</h3>
-                        <button class="add-product-link" id="addProductBtn"><i class="fas fa-plus-circle"></i> Add New Product</button>
-                    </div>
+                    <div class="add-product-header"><h3><i class="fas fa-boxes"></i> All Products</h3><button class="add-product-link" id="addProductBtn"><i class="fas fa-plus-circle"></i> Add New Product</button></div>
                     <div class="products-list" id="productsList"></div>
                 </div>
                 <div class="tab-content" id="ordersTab">
-                    <div class="orders-table">
-                        <table style="width:100%">
-                            <thead>
-                                <tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th><th>Update</th><th>Actions</th></tr>
-                            </thead>
-                            <tbody id="ordersList"></tbody>
-                         </table>
+                    <div class="order-filters">
+                        <div class="filter-group">
+                            <span style="color:#888;">📅 Quick Date:</span>
+                            <button class="filter-btn date-filter-btn active" data-filter="all" onclick="applyDateFilter('all')">All Orders</button>
+                            <button class="filter-btn date-filter-btn" data-filter="today" onclick="applyDateFilter('today')">Today</button>
+                            <button class="filter-btn date-filter-btn" data-filter="week" onclick="applyDateFilter('week')">This Week</button>
+                            <button class="filter-btn date-filter-btn" data-filter="month" onclick="applyDateFilter('month')">This Month</button>
+                        </div>
+                        <div class="filter-group">
+                            <span style="color:#888;">📅 Custom Range:</span>
+                            <div class="date-range-box" onclick="openDatePicker()"><i class="fas fa-calendar-alt"></i><span class="date-range-text" id="dateRangeText">Select Date Range</span><i class="fas fa-chevron-down"></i></div>
+                            <button class="filter-btn" onclick="clearDateRange()" style="background:rgba(244,67,54,0.2); color:#F44336;"><i class="fas fa-times"></i> Clear</button>
+                        </div>
+                        <div class="filter-group">
+                            <span style="color:#888;">📊 Status:</span>
+                            <button class="filter-btn status-filter-btn active" data-status="all" onclick="applyStatusFilter('all')">All</button>
+                            <button class="filter-btn status-filter-btn" data-status="confirmed" onclick="applyStatusFilter('confirmed')">Confirmed</button>
+                            <button class="filter-btn status-filter-btn" data-status="processing" onclick="applyStatusFilter('processing')">Processing</button>
+                            <button class="filter-btn status-filter-btn" data-status="shipped" onclick="applyStatusFilter('shipped')">Shipped</button>
+                            <button class="filter-btn status-filter-btn" data-status="delivered" onclick="applyStatusFilter('delivered')">Delivered</button>
+                            <button class="filter-btn status-filter-btn" data-status="cancelled" onclick="applyStatusFilter('cancelled')">Cancelled</button>
+                        </div>
                     </div>
+                    <div class="orders-table"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th><th>Update</th><th>Actions</th></tr></thead><tbody id="ordersList"></tbody></table></div>
                 </div>
                 <div id="editModal" class="edit-modal"></div>
+                <div id="orderModal" class="order-modal"><div class="order-modal-content"><div class="order-modal-header"><h3><i class="fas fa-receipt"></i> Order Details</h3><button class="close-order-modal" onclick="closeOrderModal()">&times;</button></div><div id="orderDetailContent"></div></div></div>
             `;
+            
+            // Datepicker Modal
+            const datepickerModal = document.createElement('div'); 
+            datepickerModal.id = 'datepickerModal'; 
+            datepickerModal.className = 'datepicker-modal'; 
+            datepickerModal.innerHTML = `
+                <div class="datepicker-content">
+                    <h3><i class="fas fa-calendar-alt"></i> Select Date Range</h3>
+                    <div class="datepicker-input-group"><label>Start Date</label><div class="clickable-date-input" onclick="setStartDate()"><span id="startDateDisplay"><span class="placeholder-text">dd/mm/yyyy</span></span><i class="fas fa-calendar"></i></div></div>
+                    <div class="datepicker-input-group"><label>End Date (Optional)</label><div class="clickable-date-input" onclick="setEndDate()"><span id="endDateDisplay"><span class="placeholder-text">dd/mm/yyyy (Optional)</span></span><i class="fas fa-calendar"></i></div></div>
+                    <div class="datepicker-buttons"><button class="datepicker-cancel" onclick="closeDatePicker()">Cancel</button><button class="datepicker-apply" onclick="applyDateRange()">Apply</button></div>
+                </div>
+            `;
+            document.body.appendChild(datepickerModal);
             
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -1313,6 +1528,7 @@
                     btn.classList.add('active');
                     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
                     document.getElementById(`${btn.dataset.tab}Tab`).classList.add('active');
+                    if (btn.dataset.tab === 'orders') renderOrders();
                 });
             });
             
@@ -1328,29 +1544,18 @@
         
         function renderLoginPage() {
             document.getElementById('app').innerHTML = `
-                <div class="login-container">
-                    <div class="login-card">
-                        <h2>VEDANTA ADMIN</h2>
-                        <p>Enter credentials</p>
-                        <div class="input-group">
-                            <label>Username</label>
-                            <input type="text" id="adminUsername">
-                        </div>
-                        <div class="input-group">
-                            <label>Password</label>
-                            <input type="password" id="adminPassword">
-                        </div>
-                        <button class="login-btn" id="loginBtn">Login</button>
-                        <div class="error-msg" id="errorMsg" style="color:#F44336; text-align:center; margin-top:15px; display:none;">❌ Invalid credentials</div>
-                    </div>
-                </div>
+                <div class="login-container"><div class="login-card"><h2>VEDANTA ADMIN</h2><p>Enter credentials</p>
+                <div class="input-group"><label>Username</label><input type="text" id="adminUsername"></div>
+                <div class="input-group"><label>Password</label><input type="password" id="adminPassword"></div>
+                <button class="login-btn" id="loginBtn">Login</button>
+                <div class="error-msg" id="errorMsg" style="color:#F44336; text-align:center; margin-top:15px; display:none;">❌ Invalid credentials</div></div></div>
             `;
             document.getElementById('loginBtn').addEventListener('click', () => {
                 const u = document.getElementById('adminUsername').value.trim();
                 const p = document.getElementById('adminPassword').value.trim();
                 if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
                     localStorage.setItem('adminLoggedIn', 'true');
-                    showToast('✅ Login success! Cloud sync enabled');
+                    showToast('✅ Login success!');
                     isLoggedIn = true;
                     renderDashboard();
                 } else {
@@ -1360,7 +1565,7 @@
             });
         }
         
-        // Make all functions global for onclick
+        // Global functions
         window.openEditModal = openEditModal;
         window.closeEditModal = closeEditModal;
         window.saveProductEdit = saveProductEdit;
@@ -1368,6 +1573,7 @@
         window.updateOrderStatus = updateOrderStatus;
         window.deleteOrder = deleteOrder;
         window.viewOrderDetails = viewOrderDetails;
+        window.closeOrderModal = closeOrderModal;
         window.goToAddProduct = goToAddProduct;
         window.addSize = addSize;
         window.removeSize = removeSize;
@@ -1380,11 +1586,18 @@
         window.addColorFromMain = addColorFromMain;
         window.addColorFromFullGrid = addColorFromFullGrid;
         window.toggleFullColorGrid = toggleFullColorGrid;
+        window.applyDateFilter = applyDateFilter;
+        window.applyStatusFilter = applyStatusFilter;
+        window.openDatePicker = openDatePicker;
+        window.closeDatePicker = closeDatePicker;
+        window.applyDateRange = applyDateRange;
+        window.clearDateRange = clearDateRange;
+        window.setStartDate = setStartDate;
+        window.setEndDate = setEndDate;
         
         if (isLoggedIn) renderDashboard();
         else renderLoginPage();
         
-        // Real-time listeners
         if (typeof db !== 'undefined') {
             db.collection('products').onSnapshot(() => { if (isLoggedIn) loadData(); });
             db.collection('orders').onSnapshot(() => { if (isLoggedIn) loadData(); });
