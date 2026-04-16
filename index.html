@@ -6,7 +6,6 @@
     <title>Vedanta Admin Panel | Firebase Sync</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
@@ -98,7 +97,6 @@
         .tab-content { display: none; padding: 0 20px 20px; }
         .tab-content.active { display: block; }
         
-        /* Order Filters */
         .order-filters {
             display: flex;
             flex-wrap: wrap;
@@ -268,7 +266,6 @@
         .edit-btn { background: rgba(33,150,243,0.2); color: #2196F3; }
         .delete-btn { background: rgba(244,67,54,0.2); color: #F44336; }
         
-        /* Edit Modal Styles */
         .edit-modal {
             display: none;
             position: fixed;
@@ -540,7 +537,6 @@
         .view-details { background: rgba(212,175,55,0.15); color: #D4AF37; }
         .delete-order-btn { background: rgba(244,67,54,0.2); color: #F44336; }
         
-        /* Order Details Modal */
         .order-modal {
             display: none;
             position: fixed;
@@ -622,6 +618,34 @@
             border-radius: 20px;
             font-size: 11px;
             color: #D4AF37;
+            margin-top: 5px;
+            margin-right: 8px;
+        }
+        .order-item-color {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(212,175,55,0.15);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #D4AF37;
+            margin-top: 5px;
+        }
+        .color-swatch-small {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .combo-badge-detail {
+            background: #4CAF50;
+            color: white;
+            font-size: 11px;
+            padding: 3px 12px;
+            border-radius: 20px;
+            display: inline-block;
             margin-top: 5px;
         }
         .order-item-price {
@@ -755,7 +779,6 @@
         let orders = [];
         let currentEditProduct = null;
         
-        // Filter states
         let currentDateFilter = 'all';
         let currentStatusFilter = 'all';
         let customStartDate = '';
@@ -763,7 +786,6 @@
         let tempStartDate = '';
         let tempEndDate = '';
         
-        // ========== COLOR DATABASE ==========
         const mainColorsList = [
             { name: "Red", code: "#FF0000" }, { name: "Crimson", code: "#DC143C" }, { name: "Maroon", code: "#800000" },
             { name: "Orange", code: "#FFA500" }, { name: "Gold", code: "#FFD700" }, { name: "Yellow", code: "#FFFF00" },
@@ -799,6 +821,14 @@
             return colors;
         }
         
+        function getColorCode(colorName) {
+            if (!colorName) return '#D4AF37';
+            const allColors = getAllColorsList();
+            const found = allColors.find(c => c.name.toLowerCase() === colorName.toLowerCase());
+            if (found) return found.code;
+            return '#D4AF37';
+        }
+        
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             toast.innerText = msg;
@@ -808,12 +838,9 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
         
-        // ========== DATE FUNCTIONS (from first code) ==========
         function parseOrderDate(orderDateStr) {
             if (!orderDateStr) return null;
-            try {
-                return new Date(orderDateStr);
-            } catch(e) { return null; }
+            try { return new Date(orderDateStr); } catch(e) { return null; }
         }
         
         function isToday(orderDate) {
@@ -845,7 +872,6 @@
             const startParts = customStartDate.split('/');
             const startDate = new Date(parseInt(startParts[2]), parseInt(startParts[1]) - 1, parseInt(startParts[0]));
             startDate.setHours(0,0,0,0);
-            
             if (customEndDate) {
                 const endParts = customEndDate.split('/');
                 const endDate = new Date(parseInt(endParts[2]), parseInt(endParts[1]) - 1, parseInt(endParts[0]));
@@ -857,27 +883,22 @@
         
         function filterOrders() {
             let filtered = [...orders];
-            
             if (currentStatusFilter !== 'all') {
                 filtered = filtered.filter(o => o.status === currentStatusFilter);
             }
-            
             filtered = filtered.filter(o => {
                 const orderDate = parseOrderDate(o.orderDate);
                 if (!orderDate) return currentDateFilter === 'all';
-                
                 if (currentDateFilter === 'today') return isToday(orderDate);
                 if (currentDateFilter === 'week') return isThisWeek(orderDate);
                 if (currentDateFilter === 'month') return isThisMonth(orderDate);
                 if (currentDateFilter === 'custom') return isWithinCustomRange(orderDate);
                 return true;
             });
-            
             filtered.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
             return filtered;
         }
         
-        // ========== LOAD DATA ==========
         async function loadData() {
             try {
                 const productsSnap = await db.collection('products').orderBy('createdAt', 'desc').get();
@@ -898,36 +919,28 @@
             try {
                 await db.collection('products').doc(productId).update(updatedData);
                 return { success: true };
-            } catch(error) {
-                return { success: false, error: error.message };
-            }
+            } catch(error) { return { success: false, error: error.message }; }
         }
         
         async function deleteProductFromFirebase(productId) {
             try {
                 await db.collection('products').doc(productId).delete();
                 return { success: true };
-            } catch(error) {
-                return { success: false, error: error.message };
-            }
+            } catch(error) { return { success: false, error: error.message }; }
         }
         
         async function deleteOrderFromFirebase(orderId) {
             try {
                 await db.collection('orders').doc(orderId).delete();
                 return { success: true };
-            } catch(error) {
-                return { success: false, error: error.message };
-            }
+            } catch(error) { return { success: false, error: error.message }; }
         }
         
         async function updateOrderStatusInFirebase(orderId, newStatus) {
             try {
                 await db.collection('orders').doc(orderId).update({ status: newStatus, updatedAt: new Date().toISOString() });
                 return { success: true };
-            } catch(error) {
-                return { success: false, error: error.message };
-            }
+            } catch(error) { return { success: false, error: error.message }; }
         }
         
         function calculateTotalRevenue() {
@@ -952,7 +965,6 @@
             }
         }
         
-        // ========== PRODUCTS ==========
         function renderProducts() {
             const container = document.getElementById('productsList');
             if (!container) return;
@@ -1000,16 +1012,13 @@
             });
         }
         
-        // ========== EDIT MODAL ==========
         function openEditModal(productId) {
             currentEditProduct = products.find(p => p.id == productId);
             if (!currentEditProduct) return;
-            
             if (!currentEditProduct.sizes) currentEditProduct.sizes = [];
             if (!currentEditProduct.colors) currentEditProduct.colors = [];
             if (!currentEditProduct.images) currentEditProduct.images = [];
             if (!currentEditProduct.combos) currentEditProduct.combos = [];
-            
             renderEditModal();
             document.getElementById('editModal').classList.add('show');
         }
@@ -1017,24 +1026,14 @@
         function renderEditModal() {
             const modal = document.getElementById('editModal');
             if (!modal) return;
-            
-            const sizesHtml = (currentEditProduct.sizes || []).map((size, idx) => `
-                <span class="chip">${escapeHtml(size)} <span class="remove-chip" onclick="removeSize(${idx})">✕</span></span>
-            `).join('');
-            
+            const sizesHtml = (currentEditProduct.sizes || []).map((size, idx) => `<span class="chip">${escapeHtml(size)} <span class="remove-chip" onclick="removeSize(${idx})">✕</span></span>`).join('');
             const colorsHtml = (currentEditProduct.colors || []).map((color, idx) => {
                 const colorName = typeof color === 'object' ? color.name : color;
                 const colorCode = typeof color === 'object' ? color.code : '#D4AF37';
                 return `<span class="chip"><span class="color-dot-small" style="background: ${colorCode};"></span> ${escapeHtml(colorName)} <span class="remove-chip" onclick="removeColor(${idx})">✕</span></span>`;
             }).join('');
-            
-            const imagesHtml = (currentEditProduct.images || []).map((img, idx) => `
-                <div class="edit-preview-img"><img src="${img}"><div class="remove-image-btn" onclick="removeImage(${idx})">✕</div></div>
-            `).join('');
-            
-            const combosHtml = (currentEditProduct.combos || []).map((combo, idx) => `
-                <span class="chip">${combo.quantity} for ₹${combo.price} <span class="remove-chip" onclick="removeCombo(${idx})">✕</span></span>
-            `).join('');
+            const imagesHtml = (currentEditProduct.images || []).map((img, idx) => `<div class="edit-preview-img"><img src="${img}"><div class="remove-image-btn" onclick="removeImage(${idx})">✕</div></div>`).join('');
+            const combosHtml = (currentEditProduct.combos || []).map((combo, idx) => `<span class="chip">${combo.quantity} for ₹${combo.price} <span class="remove-chip" onclick="removeCombo(${idx})">✕</span></span>`).join('');
             
             modal.innerHTML = `
                 <div class="edit-modal-content">
@@ -1065,12 +1064,10 @@
                         <div class="form-group"><label>Price (₹)</label><input type="number" id="editPrice" value="${currentEditProduct.price}"></div>
                         <div class="form-group"><label>Compare Price (MRP)</label><input type="number" id="editComparePrice" value="${currentEditProduct.comparePrice || ''}"></div>
                     </div>
-                    
                     <div class="form-group"><label><i class="fas fa-tshirt"></i> Sizes Available</label>
                         <div class="chips-container">${sizesHtml || '<span style="color:#888;">No sizes added</span>'}</div>
                         <div class="add-section"><input type="text" id="newSizeInput" placeholder="Enter size"><button class="add-btn" onclick="addSize()">+ Add Size</button></div>
                     </div>
-                    
                     <div class="form-group"><label><i class="fas fa-palette"></i> Colors Available</label>
                         <div class="chips-container">${colorsHtml || '<span style="color:#888;">No colors added</span>'}</div>
                         <div class="main-colors-container" id="mainColorList"></div>
@@ -1081,17 +1078,14 @@
                         </div>
                         <div class="add-section"><input type="text" id="newColorName" placeholder="Custom color name"><input type="color" id="newColorCode" value="#D4AF37" style="width:60px;"><button class="add-btn" onclick="addColor()">+ Add Custom</button></div>
                     </div>
-                    
                     <div class="form-group"><label><i class="fas fa-images"></i> Product Images</label>
                         <div class="image-preview-edit">${imagesHtml || '<span style="color:#888;">No images</span>'}</div>
                         <div class="add-section"><input type="file" id="newImagesInput" multiple accept="image/*"><button class="add-btn" onclick="addImages()">Upload Images</button></div>
                     </div>
-                    
                     <div class="form-group"><label><i class="fas fa-gift"></i> Combo Offers</label>
                         <div class="chips-container">${combosHtml || '<span style="color:#888;">No combos</span>'}</div>
                         <div class="add-section"><input type="number" id="newComboQty" placeholder="Qty"><input type="number" id="newComboPrice" placeholder="Price"><button class="add-btn" onclick="addCombo()">+ Add Combo</button></div>
                     </div>
-                    
                     <div class="form-group"><label>Full Description</label><textarea id="editFullDesc" rows="3">${escapeHtml(currentEditProduct.fullDesc || '')}</textarea></div>
                     <div class="form-row">
                         <div class="form-group"><label>Stock Quantity</label><input type="number" id="editStock" value="${currentEditProduct.stock || 10}"></div>
@@ -1101,7 +1095,6 @@
                     <button class="save-edit-btn" onclick="saveProductEdit()"><i class="fas fa-save"></i> Save Changes</button>
                 </div>
             `;
-            
             renderMainColorButtons();
         }
         
@@ -1114,7 +1107,6 @@
                     <span class="main-color-name">${escapeHtml(color.name)}</span>
                 </div>
             `).join('');
-            
             document.getElementById('seeAllColorsBtn')?.addEventListener('click', () => toggleFullColorGrid(true));
             document.getElementById('closeColorGridBtn')?.addEventListener('click', () => toggleFullColorGrid(false));
         }
@@ -1145,9 +1137,7 @@
                 currentEditProduct.colors.push({ name: name, code: code });
                 renderEditModal();
                 showToast(`✅ ${name} added!`);
-            } else {
-                showToast(`⚠️ ${name} already exists`, true);
-            }
+            } else { showToast(`⚠️ ${name} already exists`, true); }
         }
         
         function addColorFromFullGrid(name, code) { addColorFromMain(name, code); }
@@ -1243,17 +1233,15 @@
             }
         }
         
-        // ========== ORDERS (with first code's beautiful modal) ==========
+        // ========== ORDER DETAILS WITH PROPER COMBO AND COLOR DISPLAY ==========
         function renderOrders() {
             const container = document.getElementById('ordersList');
             if (!container) return;
-            
             const filteredOrders = filterOrders();
             if (filteredOrders.length === 0) {
                 container.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px;">📭 No orders found</td></tr>';
                 return;
             }
-            
             container.innerHTML = filteredOrders.map(order => {
                 const statusBadgeClass = (() => {
                     switch(order.status) {
@@ -1296,8 +1284,19 @@
                 const hasImage = product && product.images && product.images.length > 0;
                 const imageUrl = hasImage ? product.images[0] : null;
                 const itemIcon = product ? (product.icon || 'fa-gem') : 'fa-gem';
-                const itemSize = item.size || 'Not Selected';
-                const itemColor = item.color || '';
+                const itemSize = item.size || item.selectedSize || '';
+                const itemColor = item.color || item.selectedColor || '';
+                const colorCode = getColorCode(itemColor);
+                
+                // Check for combo information - multiple possible locations in order data
+                let comboDisplay = '';
+                if (item.combo) {
+                    comboDisplay = `<div class="combo-badge-detail"><i class="fas fa-gift"></i> ${escapeHtml(item.combo)}</div>`;
+                } else if (item.isCombo && item.comboMultiplier) {
+                    comboDisplay = `<div class="combo-badge-detail"><i class="fas fa-gift"></i> Combo: ${item.comboMultiplier} items per pack</div>`;
+                } else if (item.comboInfo) {
+                    comboDisplay = `<div class="combo-badge-detail"><i class="fas fa-gift"></i> ${escapeHtml(item.comboInfo)}</div>`;
+                }
                 
                 return `
                     <div class="order-item-with-img">
@@ -1306,8 +1305,9 @@
                         </div>
                         <div class="order-item-info">
                             <h4>${escapeHtml(item.name)}</h4>
-                            ${itemSize !== 'Not Selected' ? `<div class="order-item-size"><i class="fas fa-tshirt"></i> Size: ${escapeHtml(itemSize)}</div>` : ''}
-                            ${itemColor ? `<div class="order-item-size"><i class="fas fa-palette"></i> Color: ${escapeHtml(itemColor)}</div>` : ''}
+                            ${itemSize ? `<div class="order-item-size"><i class="fas fa-tshirt"></i> Size: ${escapeHtml(itemSize)}</div>` : ''}
+                            ${itemColor ? `<div class="order-item-color"><span class="color-swatch-small" style="background: ${colorCode}; border:1px solid rgba(255,255,255,0.3);"></span> Color: ${escapeHtml(itemColor)}</div>` : ''}
+                            ${comboDisplay}
                             <p>Quantity: ${item.quantity} × ₹${(item.price || 0).toLocaleString('en-IN')}</p>
                         </div>
                         <div class="order-item-price">₹${((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN')}</div>
@@ -1336,10 +1336,10 @@
                 <div class="order-detail-row"><strong>Name:</strong> ${order.customerName || 'Guest'}</div>
                 <div class="order-detail-row"><strong>📞 Phone:</strong> ${order.customerPhone || 'N/A'}</div>
                 <div class="order-detail-row"><strong>✉️ Email:</strong> ${order.customerEmail || 'N/A'}</div>
-                <div class="order-detail-row"><strong>📍 Address:</strong> ${order.shippingAddress?.address || 'N/A'}</div>
+                <div class="order-detail-row"><strong>📍 Address:</strong> ${order.shippingAddress?.address || 'N/A'}, ${order.shippingAddress?.city || ''}, ${order.shippingAddress?.state || ''} - ${order.shippingAddress?.pincode || ''}</div>
                 <div style="margin: 15px 0; border-top: 1px solid rgba(255,255,255,0.1);"></div>
                 <strong>🛍️ Order Items:</strong>
-                ${itemsHtml || '<div class="order-detail-row">No items</div>'}
+                ${itemsHtml || '<div class="order-detail-row">No items found</div>'}
                 <div style="margin-top: 15px; border-top: 1px solid rgba(212,175,55,0.3);"></div>
                 <div class="order-detail-row"><strong>💰 Total Amount:</strong> <span style="color:#D4AF37; font-size:18px;">₹${(order.total || 0).toLocaleString('en-IN')}</span></div>
             `;
@@ -1364,7 +1364,6 @@
             }
         }
         
-        // ========== FILTER FUNCTIONS ==========
         function openDatePicker() { document.getElementById('datepickerModal').classList.add('show'); }
         function closeDatePicker() { document.getElementById('datepickerModal').classList.remove('show'); }
         
@@ -1502,13 +1501,12 @@
                             <button class="filter-btn status-filter-btn" data-status="cancelled" onclick="applyStatusFilter('cancelled')">Cancelled</button>
                         </div>
                     </div>
-                    <div class="orders-table"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th><th>Update</th><th>Actions</th></tr></thead><tbody id="ordersList"></tbody></table></div>
+                    <div class="orders-table"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th><th>Update</th><th>Actions</th></tr></thead><tbody id="ordersList"></tbody>}</div>
                 </div>
                 <div id="editModal" class="edit-modal"></div>
                 <div id="orderModal" class="order-modal"><div class="order-modal-content"><div class="order-modal-header"><h3><i class="fas fa-receipt"></i> Order Details</h3><button class="close-order-modal" onclick="closeOrderModal()">&times;</button></div><div id="orderDetailContent"></div></div></div>
             `;
             
-            // Datepicker Modal
             const datepickerModal = document.createElement('div'); 
             datepickerModal.id = 'datepickerModal'; 
             datepickerModal.className = 'datepicker-modal'; 
@@ -1538,7 +1536,6 @@
                 isLoggedIn = false;
                 renderLoginPage();
             });
-            
             loadData();
         }
         
@@ -1565,7 +1562,7 @@
             });
         }
         
-        // Global functions
+        // Make functions global
         window.openEditModal = openEditModal;
         window.closeEditModal = closeEditModal;
         window.saveProductEdit = saveProductEdit;
