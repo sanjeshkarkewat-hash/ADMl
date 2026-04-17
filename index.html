@@ -47,6 +47,29 @@
             background-clip: text;
             color: transparent;
         }
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .return-manage-btn {
+            background: rgba(255,152,0,0.15);
+            border: 1px solid rgba(255,152,0,0.3);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: #FF9800;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .return-manage-btn:hover {
+            background: rgba(255,152,0,0.25);
+            transform: scale(0.98);
+        }
         .logout-btn {
             background: rgba(244,67,54,0.15);
             border: 1px solid rgba(244,67,54,0.3);
@@ -143,14 +166,8 @@
             border-color: #D4AF37;
             background: rgba(212,175,55,0.1);
         }
-        .date-range-box i {
-            color: #D4AF37;
-            font-size: 14px;
-        }
-        .date-range-text {
-            font-size: 12px;
-            color: #DDD;
-        }
+        .date-range-box i { color: #D4AF37; font-size: 14px; }
+        .date-range-text { font-size: 12px; color: #DDD; }
         .datepicker-modal {
             display: none;
             position: fixed;
@@ -242,15 +259,8 @@
             align-items: center;
             justify-content: center;
         }
-        .product-img-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .product-img-preview i {
-            font-size: 55px;
-            color: #D4AF37;
-        }
+        .product-img-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .product-img-preview i { font-size: 55px; color: #D4AF37; }
         .product-item h4 { font-size: 16px; margin-bottom: 8px; }
         .product-price { color: #D4AF37; font-weight: 700; font-size: 18px; margin: 8px 0; }
         .product-category { font-size: 11px; color: #888; margin-bottom: 8px; }
@@ -343,11 +353,7 @@
             align-items: center;
             gap: 8px;
         }
-        .chip .remove-chip {
-            color: #F44336;
-            cursor: pointer;
-            font-size: 12px;
-        }
+        .chip .remove-chip { color: #F44336; cursor: pointer; font-size: 12px; }
         .add-section {
             display: flex;
             gap: 10px;
@@ -396,11 +402,7 @@
             overflow: hidden;
             position: relative;
         }
-        .edit-preview-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .edit-preview-img img { width: 100%; height: 100%; object-fit: cover; }
         .remove-image-btn {
             position: absolute;
             top: -8px;
@@ -592,15 +594,8 @@
             margin-right: 15px;
             flex-shrink: 0;
         }
-        .order-product-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .order-product-img i {
-            font-size: 35px;
-            color: #D4AF37;
-        }
+        .order-product-img img { width: 100%; height: 100%; object-fit: cover; }
+        .order-product-img i { font-size: 35px; color: #D4AF37; }
         .order-item-with-img {
             display: flex;
             align-items: center;
@@ -751,6 +746,7 @@
             .order-filters { flex-direction: column; align-items: stretch; }
             .main-color-circle { width: 35px; height: 35px; }
             .main-color-name { font-size: 8px; }
+            .header-buttons { width: 100%; justify-content: flex-end; }
         }
     </style>
 </head>
@@ -838,65 +834,29 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
         
-        function parseOrderDate(orderDateStr) {
-            if (!orderDateStr) return null;
-            try { return new Date(orderDateStr); } catch(e) { return null; }
+        function loadFromCache() {
+            try {
+                const cachedProducts = localStorage.getItem('admin_products_cache');
+                if (cachedProducts) {
+                    products = JSON.parse(cachedProducts);
+                    renderProducts();
+                    updateStats();
+                }
+                
+                const cachedOrders = localStorage.getItem('admin_orders_cache');
+                if (cachedOrders) {
+                    orders = JSON.parse(cachedOrders);
+                    renderOrders();
+                    updateStats();
+                }
+            } catch(e) { console.log("Cache load error:", e); }
         }
         
-        function isToday(orderDate) {
-            if (!orderDate) return false;
-            const today = new Date();
-            return orderDate.toDateString() === today.toDateString();
-        }
-        
-        function isThisWeek(orderDate) {
-            if (!orderDate) return false;
-            const today = new Date();
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
-            startOfWeek.setHours(0,0,0,0);
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6);
-            endOfWeek.setHours(23,59,59,999);
-            return orderDate >= startOfWeek && orderDate <= endOfWeek;
-        }
-        
-        function isThisMonth(orderDate) {
-            if (!orderDate) return false;
-            const today = new Date();
-            return orderDate.getMonth() === today.getMonth() && orderDate.getFullYear() === today.getFullYear();
-        }
-        
-        function isWithinCustomRange(orderDate) {
-            if (!customStartDate || !orderDate) return true;
-            const startParts = customStartDate.split('/');
-            const startDate = new Date(parseInt(startParts[2]), parseInt(startParts[1]) - 1, parseInt(startParts[0]));
-            startDate.setHours(0,0,0,0);
-            if (customEndDate) {
-                const endParts = customEndDate.split('/');
-                const endDate = new Date(parseInt(endParts[2]), parseInt(endParts[1]) - 1, parseInt(endParts[0]));
-                endDate.setHours(23,59,59,999);
-                return orderDate >= startDate && orderDate <= endDate;
-            }
-            return orderDate.toDateString() === startDate.toDateString();
-        }
-        
-        function filterOrders() {
-            let filtered = [...orders];
-            if (currentStatusFilter !== 'all') {
-                filtered = filtered.filter(o => o.status === currentStatusFilter);
-            }
-            filtered = filtered.filter(o => {
-                const orderDate = parseOrderDate(o.orderDate);
-                if (!orderDate) return currentDateFilter === 'all';
-                if (currentDateFilter === 'today') return isToday(orderDate);
-                if (currentDateFilter === 'week') return isThisWeek(orderDate);
-                if (currentDateFilter === 'month') return isThisMonth(orderDate);
-                if (currentDateFilter === 'custom') return isWithinCustomRange(orderDate);
-                return true;
-            });
-            filtered.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
-            return filtered;
+        function saveToCache() {
+            try {
+                localStorage.setItem('admin_products_cache', JSON.stringify(products));
+                localStorage.setItem('admin_orders_cache', JSON.stringify(orders));
+            } catch(e) { console.log("Cache save error:", e); }
         }
         
         async function loadData() {
@@ -909,9 +869,11 @@
                 orders = [];
                 ordersSnap.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
                 
-                updateStats();
+                saveToCache();
                 renderProducts();
                 renderOrders();
+                updateStats();
+                
             } catch(e) { console.log(e); }
         }
         
@@ -956,6 +918,7 @@
             const totalOrdersEl = document.getElementById('totalOrders');
             const totalRevenueEl = document.getElementById('totalRevenue');
             const totalCustomersEl = document.getElementById('totalCustomers');
+            
             if (totalProductsEl) totalProductsEl.innerText = products.length;
             if (totalOrdersEl) totalOrdersEl.innerText = calculateTotalOrders();
             if (totalRevenueEl) totalRevenueEl.innerText = '₹' + calculateTotalRevenue().toLocaleString('en-IN');
@@ -1233,7 +1196,67 @@
             }
         }
         
-        // ========== ORDER DETAILS WITH PROPER COMBO AND COLOR DISPLAY ==========
+        function parseOrderDate(orderDateStr) {
+            if (!orderDateStr) return null;
+            try { return new Date(orderDateStr); } catch(e) { return null; }
+        }
+        
+        function isToday(orderDate) {
+            if (!orderDate) return false;
+            const today = new Date();
+            return orderDate.toDateString() === today.toDateString();
+        }
+        
+        function isThisWeek(orderDate) {
+            if (!orderDate) return false;
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            startOfWeek.setHours(0,0,0,0);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            endOfWeek.setHours(23,59,59,999);
+            return orderDate >= startOfWeek && orderDate <= endOfWeek;
+        }
+        
+        function isThisMonth(orderDate) {
+            if (!orderDate) return false;
+            const today = new Date();
+            return orderDate.getMonth() === today.getMonth() && orderDate.getFullYear() === today.getFullYear();
+        }
+        
+        function isWithinCustomRange(orderDate) {
+            if (!customStartDate || !orderDate) return true;
+            const startParts = customStartDate.split('/');
+            const startDate = new Date(parseInt(startParts[2]), parseInt(startParts[1]) - 1, parseInt(startParts[0]));
+            startDate.setHours(0,0,0,0);
+            if (customEndDate) {
+                const endParts = customEndDate.split('/');
+                const endDate = new Date(parseInt(endParts[2]), parseInt(endParts[1]) - 1, parseInt(endParts[0]));
+                endDate.setHours(23,59,59,999);
+                return orderDate >= startDate && orderDate <= endDate;
+            }
+            return orderDate.toDateString() === startDate.toDateString();
+        }
+        
+        function filterOrders() {
+            let filtered = [...orders];
+            if (currentStatusFilter !== 'all') {
+                filtered = filtered.filter(o => o.status === currentStatusFilter);
+            }
+            filtered = filtered.filter(o => {
+                const orderDate = parseOrderDate(o.orderDate);
+                if (!orderDate) return currentDateFilter === 'all';
+                if (currentDateFilter === 'today') return isToday(orderDate);
+                if (currentDateFilter === 'week') return isThisWeek(orderDate);
+                if (currentDateFilter === 'month') return isThisMonth(orderDate);
+                if (currentDateFilter === 'custom') return isWithinCustomRange(orderDate);
+                return true;
+            });
+            filtered.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+            return filtered;
+        }
+        
         function renderOrders() {
             const container = document.getElementById('ordersList');
             if (!container) return;
@@ -1288,7 +1311,6 @@
                 const itemColor = item.color || item.selectedColor || '';
                 const colorCode = getColorCode(itemColor);
                 
-                // Check for combo information - multiple possible locations in order data
                 let comboDisplay = '';
                 if (item.combo) {
                     comboDisplay = `<div class="combo-badge-detail"><i class="fas fa-gift"></i> ${escapeHtml(item.combo)}</div>`;
@@ -1455,13 +1477,22 @@
         }
         
         function goToAddProduct() { window.location.href = 'admin-add-product.html'; }
+        
+        // ✅ Return Management - Open return.html page
+        function openReturnManagement() {
+            window.location.href = 'return.html';
+        }
+        
         function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m)); }
         
         function renderDashboard() {
             document.getElementById('app').innerHTML = `
                 <div class="header">
                     <div class="logo"><h1>VEDANTA ADMIN <span class="sync-badge"><i class="fas fa-cloud-upload-alt"></i> Cloud Sync</span></h1></div>
-                    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    <div class="header-buttons">
+                        <button class="return-manage-btn" id="returnManageBtn"><i class="fas fa-undo-alt"></i> Return Requests</button>
+                        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </div>
                 </div>
                 <div class="stats-grid">
                     <div class="stat-card"><i class="fas fa-box"></i><div class="stat-number" id="totalProducts">0</div><div class="stat-label">Total Products</div></div>
@@ -1536,6 +1567,9 @@
                 isLoggedIn = false;
                 renderLoginPage();
             });
+            document.getElementById('returnManageBtn')?.addEventListener('click', openReturnManagement);
+            
+            loadFromCache();
             loadData();
         }
         

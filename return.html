@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Admin - Return Management | Vedanta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0a0a0f;
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e, #0a0a15);
+            padding: 20px;
+            border-bottom: 1px solid rgba(212,175,55,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, #D4AF37, #FF8C00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .header p { color: #888; font-size: 12px; margin-top: 5px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: rgba(212,175,55,0.1);
+            border: 1px solid rgba(212,175,55,0.3);
+            padding: 10px 24px;
+            border-radius: 40px;
+            color: #ccc;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .tab-btn.active {
+            background: #D4AF37;
+            color: #050508;
+            border-color: #D4AF37;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: rgba(15,15,22,0.7);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(212,175,55,0.2);
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #D4AF37;
+        }
+        .stat-label { font-size: 12px; color: #888; margin-top: 5px; }
+        
+        .returns-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .return-card {
+            background: rgba(15,15,22,0.7);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(212,175,55,0.2);
+            transition: 0.2s;
+        }
+        .return-card.pending { border-left: 4px solid #FF9800; }
+        .return-card.approved { border-left: 4px solid #4CAF50; }
+        .return-card.rejected { border-left: 4px solid #F44336; }
+        
+        .return-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .return-id {
+            font-size: 18px;
+            font-weight: 700;
+            color: #D4AF37;
+        }
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-pending { background: rgba(255,152,0,0.2); color: #FF9800; }
+        .status-approved { background: rgba(76,175,80,0.2); color: #4CAF50; }
+        .status-rejected { background: rgba(244,67,54,0.2); color: #F44336; }
+        
+        .return-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .detail-item {
+            background: rgba(0,0,0,0.3);
+            padding: 10px 12px;
+            border-radius: 12px;
+        }
+        .detail-label {
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .items-list {
+            margin: 16px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 12px;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .btn-approve, .btn-reject {
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-approve {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-reject {
+            background: rgba(244,67,54,0.2);
+            border: 1px solid #F44336;
+            color: #F44336;
+        }
+        .btn-approve:disabled, .btn-reject:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #888;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #D4AF37;
+            color: #050508;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: bold;
+            z-index: 10000;
+            display: none;
+        }
+        .toast.show { display: block; animation: fadeInOut 2s ease; }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            .return-header { flex-direction: column; }
+            .action-buttons { flex-direction: column; }
+            .btn-approve, .btn-reject { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-undo-alt"></i> Return Management</h1>
+        <p>Manage customer return requests</p>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" data-filter="all">All Returns</button>
+            <button class="tab-btn" data-filter="pending">Pending ⏳</button>
+            <button class="tab-btn" data-filter="approved">Approved ✓</button>
+            <button class="tab-btn" data-filter="rejected">Rejected ✗</button>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="stat-number" id="totalCount">0</div><div class="stat-label">Total Returns</div></div>
+            <div class="stat-card"><div class="stat-number" id="pendingCount">0</div><div class="stat-label">Pending</div></div>
+            <div class="stat-card"><div class="stat-number" id="approvedCount">0</div><div class="stat-label">Approved</div></div>
+            <div class="stat-card"><div class="stat-number" id="rejectedCount">0</div><div class="stat-label">Rejected</div></div>
+        </div>
+        
+        <div class="returns-grid" id="returnsGrid"></div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMPUAV50FOsqpyTKY3lioeAgbQvxQzLnM",
+            authDomain: "vedanta-d0199.firebaseapp.com",
+            projectId: "vedanta-d0199",
+            storageBucket: "vedanta-d0199.firebasestorage.app",
+            messagingSenderId: "761061711987",
+            appId: "1:761061711987:web:d59ff32fd53057c395ca06"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        let allReturns = [];
+        let currentFilter = 'all';
+        
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.background = isError ? '#F44336' : '#4CAF50';
+            toast.style.color = 'white';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+        
+        async function loadReturns() {
+            try {
+                const snapshot = await db.collection('returns').orderBy('requestedDate', 'desc').get();
+                allReturns = [];
+                snapshot.forEach(doc => {
+                    allReturns.push({ id: doc.id, ...doc.data() });
+                });
+                updateStats();
+                renderReturns();
+            } catch(e) {
+                console.error("Error loading returns:", e);
+                showToast("Error loading returns", true);
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('totalCount').innerText = allReturns.length;
+            document.getElementById('pendingCount').innerText = allReturns.filter(r => r.returnStatus === 'pending').length;
+            document.getElementById('approvedCount').innerText = allReturns.filter(r => r.returnStatus === 'approved').length;
+            document.getElementById('rejectedCount').innerText = allReturns.filter(r => r.returnStatus === 'rejected').length;
+        }
+        
+        async function updateReturnStatus(returnId, orderId, newStatus, reason = null) {
+            try {
+                // Update returns collection
+                await db.collection('returns').doc(returnId).update({
+                    returnStatus: newStatus,
+                    processedDate: new Date().toISOString(),
+                    adminNotes: reason || (newStatus === 'approved' ? 'Return approved by admin' : 'Return rejected by admin')
+                });
+                
+                // Update orders collection with return status
+                const orderQuery = await db.collection('orders').where('orderId', '==', orderId).get();
+                if (!orderQuery.empty) {
+                    orderQuery.forEach(async (doc) => {
+                        await db.collection('orders').doc(doc.id).update({
+                            returnStatus: newStatus,
+                            returnProcessedDate: new Date().toISOString(),
+                            status: newStatus === 'approved' ? 'return_approved' : 'return_rejected'
+                        });
+                    });
+                }
+                
+                showToast(`Return ${newStatus === 'approved' ? 'approved' : 'rejected'} successfully!`);
+                await loadReturns(); // Reload
+                
+            } catch(e) {
+                console.error("Error updating return:", e);
+                showToast("Failed to update return status", true);
+            }
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            try {
+                return new Date(dateStr).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch(e) {
+                return dateStr;
+            }
+        }
+        
+        function renderReturns() {
+            const container = document.getElementById('returnsGrid');
+            let filtered = allReturns;
+            if (currentFilter !== 'all') {
+                filtered = allReturns.filter(r => r.returnStatus === currentFilter);
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 16px;"></i><p>No return requests found</p></div>`;
+                return;
+            }
+            
+            container.innerHTML = filtered.map(returnReq => {
+                const statusClass = returnReq.returnStatus === 'pending' ? 'status-pending' : (returnReq.returnStatus === 'approved' ? 'status-approved' : 'status-rejected');
+                const statusText = returnReq.returnStatus === 'pending' ? 'Pending' : (returnReq.returnStatus === 'approved' ? 'Approved' : 'Rejected');
+                const isPending = returnReq.returnStatus === 'pending';
+                
+                return `
+                    <div class="return-card ${returnReq.returnStatus}">
+                        <div class="return-header">
+                            <div>
+                                <div class="return-id">${escapeHtml(returnReq.orderId)}</div>
+                                <div style="font-size: 11px; color: #888; margin-top: 4px;">Return ID: ${escapeHtml(returnReq.id)}</div>
+                            </div>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        
+                        <div class="return-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Customer Name</div>
+                                <div class="detail-value">${escapeHtml(returnReq.customerName || 'N/A')}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Email</div>
+                                <div class="detail-value">${escapeHtml(returnReq.customerEmail || 'N/A')}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Phone</div>
+                                <div class="detail-value">${escapeHtml(returnReq.customerPhone || 'N/A')}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Requested Date</div>
+                                <div class="detail-value">${formatDate(returnReq.requestedDate)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Return Reason</div>
+                                <div class="detail-value">${escapeHtml(returnReq.returnReason)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Total Amount</div>
+                                <div class="detail-value" style="color: #D4AF37;">₹${(returnReq.totalAmount || 0).toLocaleString('en-IN')}</div>
+                            </div>
+                        </div>
+                        
+                        ${returnReq.returnComments ? `
+                            <div class="detail-item" style="margin-bottom: 12px;">
+                                <div class="detail-label">Customer Comments</div>
+                                <div class="detail-value" style="font-size: 12px;">${escapeHtml(returnReq.returnComments)}</div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="items-list">
+                            <div class="detail-label" style="margin-bottom: 8px;">Items to Return</div>
+                            ${(returnReq.items || []).map(item => `
+                                <div class="item-row">
+                                    <span>${escapeHtml(item.name)} x ${item.quantity}</span>
+                                    <span style="color: #D4AF37;">₹${(item.price * item.quantity).toLocaleString('en-IN')}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        ${isPending ? `
+                            <div class="action-buttons">
+                                <button class="btn-approve" onclick="approveReturn('${returnReq.id}', '${returnReq.orderId}')">
+                                    <i class="fas fa-check"></i> Approve Return
+                                </button>
+                                <button class="btn-reject" onclick="rejectReturn('${returnReq.id}', '${returnReq.orderId}')">
+                                    <i class="fas fa-times"></i> Reject Return
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="action-buttons">
+                                <div style="padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; width: 100%; text-align: center; font-size: 12px;">
+                                    <i class="fas ${returnReq.returnStatus === 'approved' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                                    Processed on: ${formatDate(returnReq.processedDate)}
+                                </div>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        window.approveReturn = async (returnId, orderId) => {
+            if (confirm('Approve this return request? Customer will be notified and refund will be processed.')) {
+                await updateReturnStatus(returnId, orderId, 'approved');
+            }
+        };
+        
+        window.rejectReturn = async (returnId, orderId) => {
+            const reason = prompt('Please enter reason for rejection (optional):');
+            if (confirm('Reject this return request? Customer will be notified.')) {
+                await updateReturnStatus(returnId, orderId, 'rejected', reason);
+            }
+        };
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
+        }
+        
+        // Setup filters
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.getAttribute('data-filter');
+                renderReturns();
+            });
+        });
+        
+        // Real-time listener
+        db.collection('returns').onSnapshot(() => {
+            loadReturns();
+        });
+        
+        loadReturns();
+    </script>
+</body>
+</html>
