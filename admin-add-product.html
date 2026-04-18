@@ -560,14 +560,16 @@
             <textarea id="fullDesc" rows="3" placeholder="Detailed product description..."></textarea>
         </div>
         
+        <!-- ✅ CHANGED: Max images limit increased from 5 to 20 -->
         <div class="form-group">
-            <label>Product Images</label>
+            <label>Product Images (Max 20 images)</label>
             <div class="image-upload-area" id="imageUploadArea">
                 <i class="fas fa-cloud-upload-alt" style="font-size: 40px; color: #D4AF37;"></i>
-                <p>Click to upload images (Max 5 images)</p>
+                <p>Click to upload images (Max 20 images)</p>
                 <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
             </div>
             <div class="image-preview" id="imagePreview"></div>
+            <div class="hint"><i class="fas fa-info-circle"></i> You can upload up to 20 images. Images will be compressed automatically.</div>
         </div>
         
         <div class="form-group">
@@ -615,6 +617,9 @@
     let selectedSizes = [];
     let selectedColors = [];
     let combos = [];
+    
+    // Maximum images allowed - ✅ CHANGED from 5 to 20
+    const MAX_IMAGES = 20;
     
     // ========== 200+ COLORS DATABASE ==========
     const allColors = [
@@ -857,10 +862,12 @@
     const imageInput = document.getElementById('imageInput');
     
     uploadArea?.addEventListener('click', () => imageInput.click());
+    
+    // ✅ CHANGED: Image upload limit increased from 5 to 20
     imageInput?.addEventListener('change', async (e) => {
         const files = Array.from(e.target.files);
-        if (images.length + files.length > 5) {
-            showToast('Maximum 5 images allowed', true);
+        if (images.length + files.length > MAX_IMAGES) {
+            showToast(`Maximum ${MAX_IMAGES} images allowed`, true);
             return;
         }
         for (const file of files) {
