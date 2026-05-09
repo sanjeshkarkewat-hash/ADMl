@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Vedanta Admin Panel | Free Category Input</title>
+    <title>Vedanta Admin Panel | Universal Categories</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -739,26 +739,6 @@
             gap: 8px;
             font-size: 14px;
         }
-        /* Add Product Modal Styles */
-        .add-product-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 10001;
-            align-items: center;
-            justify-content: center;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        .add-product-modal.show { display: flex; }
-        .add-product-modal .edit-modal-content {
-            max-width: 900px;
-            width: 100%;
-        }
         @media (max-width: 700px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .form-row { grid-template-columns: 1fr; }
@@ -775,13 +755,15 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // ========== 🔥 FIREBASE CONFIGURATION - UPDATED (NEW CONFIG) ==========
         const firebaseConfig = {
-            apiKey: "AIzaSyCMPUAV50FOsqpyTKY3lioeAgbQvxQzLnM",
-            authDomain: "vedanta-d0199.firebaseapp.com",
-            projectId: "vedanta-d0199",
-            storageBucket: "vedanta-d0199.firebasestorage.app",
-            messagingSenderId: "761061711987",
-            appId: "1:761061711987:web:d59ff32fd53057c395ca06"
+            apiKey: "AIzaSyCBZuwN4SKkXX1fEriYEwWDyTm-3uZnrKI",
+            authDomain: "nexi-53897.firebaseapp.com",
+            projectId: "nexi-53897",
+            storageBucket: "nexi-53897.firebasestorage.app",
+            messagingSenderId: "337349382612",
+            appId: "1:337349382612:web:ae3c9b3d0fbf69f0e38641",
+            measurementId: "G-W6N519LBPH"
         };
         
         firebase.initializeApp(firebaseConfig);
@@ -801,23 +783,6 @@
         let customEndDate = '';
         let tempStartDate = '';
         let tempEndDate = '';
-        
-        // Add product modal state
-        let newProductData = {
-            name: '',
-            category: '',
-            badge: 'New',
-            price: 0,
-            comparePrice: 0,
-            sizes: [],
-            colors: [],
-            images: [],
-            combos: [],
-            fullDesc: '',
-            stock: 10,
-            status: 'active',
-            videoUrl: ''
-        };
         
         const mainColorsList = [
             { name: "Red", code: "#FF0000" }, { name: "Crimson", code: "#DC143C" }, { name: "Maroon", code: "#800000" },
@@ -871,6 +836,7 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
         
+        // Load from cache instantly
         function loadFromCache() {
             try {
                 const cachedProducts = localStorage.getItem('admin_products_cache');
@@ -911,17 +877,6 @@
                 updateStats();
                 
             } catch(e) { console.log(e); }
-        }
-        
-        async function addProductToFirebase(productData) {
-            try {
-                const docRef = await db.collection('products').add({
-                    ...productData,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                });
-                return { success: true, id: docRef.id };
-            } catch(error) { return { success: false, error: error.message }; }
         }
         
         async function updateProductInFirebase(productId, updatedData) {
@@ -1022,206 +977,7 @@
             });
         }
         
-        // ==================== ADD PRODUCT MODAL (with free text category) ====================
-        function openAddProductModal() {
-            // Reset new product data
-            newProductData = {
-                name: '',
-                category: '',
-                badge: 'New',
-                price: 0,
-                comparePrice: 0,
-                sizes: [],
-                colors: [],
-                images: [],
-                combos: [],
-                fullDesc: '',
-                stock: 10,
-                status: 'active',
-                videoUrl: ''
-            };
-            renderAddProductModal();
-            document.getElementById('addProductModal').classList.add('show');
-        }
-        
-        function closeAddProductModal() {
-            document.getElementById('addProductModal').classList.remove('show');
-        }
-        
-        function renderAddProductModal() {
-            const modal = document.getElementById('addProductModal');
-            if (!modal) return;
-            
-            const sizesHtml = (newProductData.sizes || []).map((size, idx) => `<span class="chip">${escapeHtml(size)} <span class="remove-chip" onclick="removeNewSize(${idx})">✕</span></span>`).join('');
-            const colorsHtml = (newProductData.colors || []).map((color, idx) => {
-                const colorName = typeof color === 'object' ? color.name : color;
-                const colorCode = typeof color === 'object' ? color.code : '#D4AF37';
-                return `<span class="chip"><span class="color-dot-small" style="background: ${colorCode};"></span> ${escapeHtml(colorName)} <span class="remove-chip" onclick="removeNewColor(${idx})">✕</span></span>`;
-            }).join('');
-            const imagesHtml = (newProductData.images || []).map((img, idx) => `<div class="edit-preview-img"><img src="${img}"><div class="remove-image-btn" onclick="removeNewImage(${idx})">✕</div></div>`).join('');
-            const combosHtml = (newProductData.combos || []).map((combo, idx) => `<span class="chip">${combo.quantity} for ₹${combo.price} <span class="remove-chip" onclick="removeNewCombo(${idx})">✕</span></span>`).join('');
-            
-            modal.innerHTML = `
-                <div class="edit-modal-content">
-                    <div class="edit-modal-header">
-                        <h2><i class="fas fa-plus-circle"></i> Add New Product</h2>
-                        <button class="close-edit-modal" onclick="closeAddProductModal()">&times;</button>
-                    </div>
-                    <div class="form-group"><label>Product Name</label><input type="text" id="newProductName" placeholder="Enter product name" value="${escapeHtml(newProductData.name)}"></div>
-                    <!-- ✅ FREE TEXT INPUT for category in ADD PRODUCT too -->
-                    <div class="form-group"><label>Category (Type anything: Saree, Mobile, Electronics, Shoes, etc.)</label><input type="text" id="newProductCategory" placeholder="e.g., Saree, Kurta, Phone, Crystal, Furniture..." value="${escapeHtml(newProductData.category)}"></div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Offer Badge</label><select id="newProductBadge">
-                            <option value="Best Seller" ${newProductData.badge === 'Best Seller' ? 'selected' : ''}>🔥 Best Seller</option>
-                            <option value="Trending" ${newProductData.badge === 'Trending' ? 'selected' : ''}>⭐ Trending</option>
-                            <option value="New" ${newProductData.badge === 'New' ? 'selected' : ''}>✨ New Arrival</option>
-                            <option value="Sale" ${newProductData.badge === 'Sale' ? 'selected' : ''}>🎉 Sale</option>
-                            <option value="Limited" ${newProductData.badge === 'Limited' ? 'selected' : ''}>💎 Limited</option>
-                        </select></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Price (₹)</label><input type="number" id="newProductPrice" value="${newProductData.price}"></div>
-                        <div class="form-group"><label>Compare Price (MRP)</label><input type="number" id="newProductComparePrice" value="${newProductData.comparePrice}"></div>
-                    </div>
-                    <div class="form-group"><label><i class="fas fa-tshirt"></i> Sizes Available</label>
-                        <div class="chips-container">${sizesHtml || '<span style="color:#888;">No sizes added</span>'}</div>
-                        <div class="add-section"><input type="text" id="newSizeInput" placeholder="Enter size"><button class="add-btn" onclick="addNewSize()">+ Add Size</button></div>
-                    </div>
-                    <div class="form-group"><label><i class="fas fa-palette"></i> Colors Available</label>
-                        <div class="chips-container">${colorsHtml || '<span style="color:#888;">No colors added</span>'}</div>
-                        <div class="main-colors-container" id="newMainColorList"></div>
-                        <div class="add-section"><input type="text" id="newColorName" placeholder="Custom color name"><input type="color" id="newColorCode" value="#D4AF37" style="width:60px;"><button class="add-btn" onclick="addNewColor()">+ Add Custom</button></div>
-                    </div>
-                    <div class="form-group"><label><i class="fas fa-images"></i> Product Images</label>
-                        <div class="image-preview-edit">${imagesHtml || '<span style="color:#888;">No images</span>'}</div>
-                        <div class="add-section"><input type="file" id="newImagesInput" multiple accept="image/*"><button class="add-btn" onclick="addNewImages()">Upload Images</button></div>
-                    </div>
-                    <div class="form-group"><label><i class="fas fa-gift"></i> Combo Offers</label>
-                        <div class="chips-container">${combosHtml || '<span style="color:#888;">No combos</span>'}</div>
-                        <div class="add-section"><input type="number" id="newComboQty" placeholder="Qty"><input type="number" id="newComboPrice" placeholder="Price"><button class="add-btn" onclick="addNewCombo()">+ Add Combo</button></div>
-                    </div>
-                    <div class="form-group"><label>Full Description</label><textarea id="newProductFullDesc" rows="3">${escapeHtml(newProductData.fullDesc)}</textarea></div>
-                    <div class="form-row">
-                        <div class="form-group"><label>Stock Quantity</label><input type="number" id="newProductStock" value="${newProductData.stock}"></div>
-                        <div class="form-group"><label>Status</label><select id="newProductStatus"><option value="active" ${newProductData.status === 'active' ? 'selected' : ''}>✅ Active</option><option value="inactive" ${newProductData.status === 'inactive' ? 'selected' : ''}>❌ Inactive</option></select></div>
-                    </div>
-                    <div class="form-group"><label>Video URL</label><input type="url" id="newProductVideoUrl" value="${newProductData.videoUrl}"></div>
-                    <button class="save-edit-btn" onclick="saveNewProduct()"><i class="fas fa-save"></i> Create Product</button>
-                </div>
-            `;
-            
-            // Render main color buttons for add product modal
-            const container = document.getElementById('newMainColorList');
-            if (container) {
-                container.innerHTML = mainColorsList.map(color => `
-                    <div class="main-color-item" onclick="addNewColorFromMain('${escapeHtml(color.name)}', '${color.code}')">
-                        <div class="main-color-circle" style="background: ${color.code};"></div>
-                        <span class="main-color-name">${escapeHtml(color.name)}</span>
-                    </div>
-                `).join('');
-            }
-        }
-        
-        // Add product helper functions
-        function addNewSize() {
-            const input = document.getElementById('newSizeInput');
-            const size = input.value.trim().toUpperCase();
-            if (size && !newProductData.sizes.includes(size)) {
-                newProductData.sizes.push(size);
-                renderAddProductModal();
-                input.value = '';
-            }
-        }
-        
-        function removeNewSize(index) { newProductData.sizes.splice(index,1); renderAddProductModal(); }
-        
-        function addNewColor() {
-            const name = document.getElementById('newColorName').value.trim();
-            const code = document.getElementById('newColorCode').value;
-            if (name) {
-                const exists = newProductData.colors.some(c => (typeof c === 'object' ? c.name : c) === name);
-                if (!exists) {
-                    newProductData.colors.push({ name: name, code: code });
-                    renderAddProductModal();
-                    document.getElementById('newColorName').value = '';
-                    showToast(`✅ ${name} added!`);
-                } else { showToast('⚠️ Color exists', true); }
-            }
-        }
-        
-        function addNewColorFromMain(name, code) {
-            const exists = newProductData.colors.some(c => (typeof c === 'object' ? c.name : c) === name);
-            if (!exists) {
-                newProductData.colors.push({ name: name, code: code });
-                renderAddProductModal();
-                showToast(`✅ ${name} added!`);
-            } else { showToast(`⚠️ ${name} already exists`, true); }
-        }
-        
-        function removeNewColor(index) { newProductData.colors.splice(index,1); renderAddProductModal(); }
-        
-        function addNewCombo() {
-            const qty = parseInt(document.getElementById('newComboQty').value);
-            const price = parseInt(document.getElementById('newComboPrice').value);
-            if (qty && price) {
-                newProductData.combos.push({ quantity: qty, price: price });
-                renderAddProductModal();
-                document.getElementById('newComboQty').value = '';
-                document.getElementById('newComboPrice').value = '';
-                showToast(`✅ Combo added: ${qty} for ₹${price}`);
-            }
-        }
-        
-        function removeNewCombo(index) { newProductData.combos.splice(index,1); renderAddProductModal(); }
-        
-        async function addNewImages() {
-            const files = document.getElementById('newImagesInput').files;
-            if (!files.length) return;
-            showToast('⏳ Compressing...');
-            const newImages = [];
-            for (const file of files) newImages.push(await compressImage(file));
-            newProductData.images.push(...newImages);
-            renderAddProductModal();
-            document.getElementById('newImagesInput').value = '';
-            showToast(`✅ ${newImages.length} image(s) added`);
-        }
-        
-        function removeNewImage(index) { newProductData.images.splice(index,1); renderAddProductModal(); }
-        
-        async function saveNewProduct() {
-            const productToSave = {
-                name: document.getElementById('newProductName').value.trim(),
-                category: document.getElementById('newProductCategory').value.trim() || "General",
-                badge: document.getElementById('newProductBadge').value,
-                price: parseInt(document.getElementById('newProductPrice').value) || 0,
-                comparePrice: parseInt(document.getElementById('newProductComparePrice').value) || 0,
-                sizes: newProductData.sizes,
-                colors: newProductData.colors,
-                combos: newProductData.combos,
-                images: newProductData.images,
-                fullDesc: document.getElementById('newProductFullDesc').value,
-                stock: parseInt(document.getElementById('newProductStock').value) || 0,
-                status: document.getElementById('newProductStatus').value,
-                videoUrl: document.getElementById('newProductVideoUrl').value,
-                icon: 'fa-gem'
-            };
-            
-            if (!productToSave.name) {
-                showToast('❌ Please enter product name', true);
-                return;
-            }
-            
-            const result = await addProductToFirebase(productToSave);
-            if (result.success) {
-                showToast('✅ Product created successfully!');
-                closeAddProductModal();
-                await loadData();
-            } else {
-                showToast('❌ Failed to create product', true);
-            }
-        }
-        
-        // ==================== EDIT PRODUCT MODAL (with free text category) ====================
+        // ✅ CHANGED: Category is now a free text input (no dropdown)
         function openEditModal(productId) {
             currentEditProduct = products.find(p => p.id == productId);
             if (!currentEditProduct) {
@@ -1255,7 +1011,7 @@
                         <button class="close-edit-modal" onclick="closeEditModal()">&times;</button>
                     </div>
                     <div class="form-group"><label>Product Name</label><input type="text" id="editProductName" value="${escapeHtml(currentEditProduct.name)}"></div>
-                    <!-- ✅ FREE TEXT INPUT for category in EDIT PRODUCT -->
+                    <!-- ✅ REPLACED dropdown with free text input -->
                     <div class="form-group"><label>Category (Type anything: Saree, Mobile, Electronics, etc.)</label><input type="text" id="editCategory" value="${escapeHtml(currentEditProduct.category || '')}" placeholder="e.g., Saree, Kurta, Phone, Crystal, Furniture..."></div>
                     <div class="form-row">
                         <div class="form-group"><label>Offer Badge</label><select id="editBadge">
@@ -1719,7 +1475,7 @@
             renderOrders();
         }
         
-        function goToAddProduct() { openAddProductModal(); } // Now opens modal instead of redirect
+        function goToAddProduct() { window.location.href = 'admin-add-product.html'; }
         function openReturnManagement() { window.location.href = 'return.html'; }
         function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m)); }
         
@@ -1770,10 +1526,9 @@
                             <button class="filter-btn status-filter-btn" data-status="cancelled" onclick="applyStatusFilter('cancelled')">Cancelled</button>
                         </div>
                     </div>
-                    <div class="orders-table"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th><th>Update</th><th>Actions</th></tr></thead><tbody id="ordersList"></tbody></table></div>
+                    <div class="orders-table"><table><thead><tr><th>Order ID</th><th>Date</th><th>Customer</th><th>Amount</th><th>Status</th><th>Update</th><th>Actions</th></tr></thead><tbody id="ordersList"></tbody>}</div>
                 </div>
                 <div id="editModal" class="edit-modal"></div>
-                <div id="addProductModal" class="add-product-modal"></div>
                 <div id="orderModal" class="order-modal"><div class="order-modal-content"><div class="order-modal-header"><h3><i class="fas fa-receipt"></i> Order Details</h3><button class="close-order-modal" onclick="closeOrderModal()">&times;</button></div><div id="orderDetailContent"></div></div></div>
             `;
             
@@ -1845,9 +1600,6 @@
         window.viewOrderDetails = viewOrderDetails;
         window.closeOrderModal = closeOrderModal;
         window.goToAddProduct = goToAddProduct;
-        window.openAddProductModal = openAddProductModal;
-        window.closeAddProductModal = closeAddProductModal;
-        window.saveNewProduct = saveNewProduct;
         window.addSize = addSize;
         window.removeSize = removeSize;
         window.addColor = addColor;
@@ -1867,16 +1619,6 @@
         window.clearDateRange = clearDateRange;
         window.setStartDate = setStartDate;
         window.setEndDate = setEndDate;
-        // New product functions
-        window.addNewSize = addNewSize;
-        window.removeNewSize = removeNewSize;
-        window.addNewColor = addNewColor;
-        window.removeNewColor = removeNewColor;
-        window.addNewCombo = addNewCombo;
-        window.removeNewCombo = removeNewCombo;
-        window.addNewImages = addNewImages;
-        window.removeNewImage = removeNewImage;
-        window.addNewColorFromMain = addNewColorFromMain;
         
         if (isLoggedIn) renderDashboard();
         else renderLoginPage();
@@ -1887,4 +1629,4 @@
         }
     </script>
 </body>
-</html>												
+</html>
